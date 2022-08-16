@@ -1,3 +1,11 @@
+/*
+
+    priority-inheritance.h
+
+    The public interface for the implementation of Priority Inheritance Protocol.
+
+*/
+
 #pragma once
 
 #include "notification-manager.h"

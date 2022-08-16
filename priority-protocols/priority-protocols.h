@@ -1,3 +1,17 @@
+/*
+
+    priority-protocols.h
+
+    The common header implementing our concurrency framework for priority-aware intercomponent requests.
+    
+    Motivation, design, implementation, and evaluation are described in the following paper:
+
+    M. Sudvarg and C. Gill. A Concurrency Framework for Priority-Aware Intercomponent Requests in CAmkES on seL4.
+    The 28th IEEE International Conference on Embedded and Real-Time Computing Systems and Applications (RTCSA),
+    August 2022.
+    Available from https://www.sudvarg.com/priority-aware-camkes/
+*/
+
 #pragma once
 
 #include <camkes.h>
@@ -17,7 +31,6 @@ struct Priority_Protocol {
 };
 
 #include "priority-inheritance.h"
-
 
 //Initialize a Priority_Protocol structure
 void priority_protocol_init(struct Priority_Protocol * info,

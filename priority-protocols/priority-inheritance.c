@@ -1,3 +1,11 @@
+/*
+
+    priority-inheritance.c
+
+    The implementation of Priority Inheritance Protocol
+
+*/
+
 #include "priority-protocols.h"
 #include "notification-manager.h"
 

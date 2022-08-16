@@ -1,3 +1,12 @@
+/*
+
+    notification-manager.c
+
+    The implementation of the Notification Manager.
+    See notification-manager.h for more details.
+
+*/
+
 #include "notification-manager.h"
 
 #include <camkes.h>

@@ -1,8 +1,6 @@
-#pragma once
-
-#include <camkes.h>
-
 /*
+    notification-manager.h
+
     The standard (i.e. non-MCS) version of the seL4 kernel
     implements FIFO notification objects that are not priority-ordered.
     If a collection of threads are waiting for a signal,
@@ -37,6 +35,10 @@
     Once a thread wakes from waiting,
     it pops its Notification Node from the head of the priority queue.
 */
+
+#pragma once
+
+#include <camkes.h>
 
 struct Notification_Node {
     seL4_Word priority;

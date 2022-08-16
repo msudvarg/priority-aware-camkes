@@ -1,3 +1,17 @@
+/*
+
+    priority-protocols.c
+
+    The common implementation our concurrency framework for priority-aware intercomponent requests.
+    Includes all functionality common to the supported protocols:
+        Priority Propagation
+        Non-Preemptive Critical Sections
+        Immediate Priority Ceiling Protocol
+        Priority Inheritance Protocol
+    Additionally implements all protocols besides PIP
+
+*/
+
 #include "priority-protocols.h"
 #include "priority-inheritance.h"
 
@@ -11,7 +25,6 @@ void priority_protocol_init(struct Priority_Protocol * info,
         int priority_protocol, int priority) {
 
     //Only run on first thread
-    //TODO: is this thread safe?
     if(!info->initialized) {
         info->initialized = true;
         info->priority_protocol = priority_protocol;
