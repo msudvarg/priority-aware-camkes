@@ -1,0 +1,56 @@
+#pragma once
+
+#include <camkes.h>
+
+//These are the priority protocols we support
+enum priority_protocols {
+    propagated,
+    inherited,
+    fixed
+};
+
+struct Priority_Protocol {
+    bool initialized;
+    int priority_protocol;
+    int priority_ceiling;
+    struct Priority_Inheritance * pip;
+};
+
+#include "priority-inheritance.h"
+
+
+//Initialize a Priority_Protocol structure
+void priority_protocol_init(struct Priority_Protocol * info,
+        int priority_protocol, int priority);
+
+
+/*
+    Note that currently, promote_priority and demote_priority
+    are just wrappers around set_priority.
+    Functionally, they are equivalent.
+    However, aspectually, they are different,
+    and so we maintain separate functions in case we need different functionality.
+*/
+
+//Sets the caller's priority
+void set_priority(int priority);
+
+//Demotes the caller's priority
+static inline void demote_priority(int priority) {
+    set_priority(priority);
+}
+
+//Promotes the caller's priority
+static inline void promote_priority(int original_priority) {
+    set_priority(original_priority);
+}
+
+
+/*
+    Pre and Post functions,
+    which should run at the beginning and end of the interface handler function.
+    These call different functions depending on the protocol used.
+*/
+void priority_pre(int request_priority, struct Priority_Protocol * info);
+
+void priority_post(struct Priority_Protocol * info);
