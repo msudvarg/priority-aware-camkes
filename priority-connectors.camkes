@@ -1,3 +1,7 @@
+/*
+    Implements connector types for the seL4RPCCallPrioritized connector family
+    with threadpools sized from 1-100
+*/
 connector seL4RPCCallPrioritized1 { from Procedures with 0 threads; to Procedure with 1 threads; }
 connector seL4RPCCallPrioritized2 { from Procedures with 0 threads; to Procedure with 2 threads; }
 connector seL4RPCCallPrioritized3 { from Procedures with 0 threads; to Procedure with 3 threads; }
