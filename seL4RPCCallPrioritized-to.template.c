@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-2-Clause
  * 
  * msudvarg:
- * All code taken from seL4RPCCall-to.template.c except where noted.
+ * All code taken, except where noted,
+ * from the seL4 camkes-tool repo, /camkes/templates/seL4RPCCall-to.template.c
  */
 
 /*- if configuration[me.instance.name].get('environment', 'c').lower() == 'c' -*/

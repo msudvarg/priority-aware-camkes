@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-2-Clause
  * 
  * msudvarg:
- * All code taken from rpc-connector-common-to.c except where noted.
+ * All code taken, except where noted,
+ * from the seL4 camkes-tool repo, /camkes/templates/rpc-connector-common-to.c
  */
 
 /*- import 'helpers/error.c' as error with context -*/
@@ -154,10 +155,6 @@ int /*- if passive -*/
                             msudvarg:
 
                             Get priority from function parameter.
-
-                            TODO: allow priority to propagate automatically,
-                            without requiring manual specification of function parameter
-                            by component designer.
                         */
                         //Call hook for priority protocol prior to function run
                         priority_pre(*p_priority_ptr, &/*? me.interface.name ?*/_info);
