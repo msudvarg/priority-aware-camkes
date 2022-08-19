@@ -1,11 +1,13 @@
 /*
- * Copyright 2017, Data61, CSIRO (ABN 41 687 119 230)
  *
- * SPDX-License-Identifier: BSD-2-Clause
+ * sel4RPCCallPrioritized-to.template.c
  * 
- * msudvarg:
- * All code taken, except where noted,
+ * All code taken, except where noted (with a priority-extensions label),
  * from the seL4 camkes-tool repo, /camkes/templates/seL4RPCCall-to.template.c
+ *  
+ * Implements CAmkES seL4 RPC Call (recipient side) functionality,
+ * with additions for the priority-aware concurrency framework extensions.
+ * 
  */
 
 /*- if configuration[me.instance.name].get('environment', 'c').lower() == 'c' -*/
@@ -16,8 +18,12 @@
 #include <camkes/allocator.h>
 #include <utils/attribute.h>
 
-//msudvarg: The following line was added to include necessary declarations from the priority protocols library
-#include "/home/msudvarg/seL4/camkes-project/projects/camkes/apps/priority-framework/priority-protocols/priority-protocols.h"
+/*
+  priority-extensions:
+  
+  Include necessary declarations from the priority protocols library
+*/
+#include "priority-protocols/priority-protocols.h"
 
 /*? macros.show_includes(me.instance.type.includes) ?*/
 /*? macros.show_includes(me.interface.type.includes) ?*/
@@ -51,15 +57,16 @@
 
 
 /*
-  msudvarg:
-  The following code, until the final endif,
+  priority-extensions:
+
+  The following code, up to (but not including) the final endif,
   is added to support the priority protocols
 */
 
 //Create a component-scoped struct for the interface Priority_Protocol information
 struct Priority_Protocol /*? me.interface.name ?*/_info;
 
-//msudvarg: Include RPC priority connector template instead of default RPC connector template
+//Include RPC priority connector template instead of default RPC connector template
 /*- include 'rpc-priority-connector-common-to.c' -*/
 
 /*
@@ -79,25 +86,6 @@ void /*? me.interface.name ?*/__init(void) {
     /*- if priority_protocol not in protocols -*/
       /*? raise(TemplateError('Invalid attribute "%s" for %s, must be one of "propagated", "inherited", "fixed"' % (priority_protocol, attr), me.parent)) ?*/
     /*- endif -*/
-
-    /* Verify that this is not PIP -> PIP or PIP -> Propagated
-       Does not work: a nested component has a "uses" and a "provides" which are not easily linked.
-       We could check all "provides" for a component that connects, via "uses," to a non-fixed-type interface,
-       then raise a warning if any "provides" is type inherited,
-       but the CAmkES parser does not support checking to verify which interface calls which,
-       so we can't raise an error to stop compilation.
-       We defer this to future work.
-    /*- if priority_protocol != "fixed" -*/
-      /*- for from_end in me.parent.from_ends -*/
-        /*- set from_attr = '%s_priority_protocol' % from_end.interface.name -*/      
-        /*- set from_priority_protocol = configuration[from_end.instance.name].get(from_attr) -*/
-        /*- if from_priority_protocol == "inherited" -*/
-          /*? raise(TemplateError('Invalid connection from "%s.%s" to "%s.%s", interface of type "propagated" can only send RPC requests to interfaces of type "fixed"'
-            % (from_end.instance.name, from_end.interface.name, me.instance.name, me.interface.name), me.parent)) ?*/
-        /*- endif -*/
-      /*- endfor -*/
-    /*- endif -*/
-    */
 
     //Initialize the Priority_Protocol struct
 
@@ -129,9 +117,10 @@ void /*? me.interface.name ?*/__init(void) {
       /*
         Initialize Priority_Inheritance and Notification_Manager objects       
 
-        TODO: It might be possible to implement the notification manager
+        It might be possible to implement the notification manager
         with NUM_THREADS-1 notification nodes.
         We currently use NUM_THREADS for safety.
+        We defer analysis and evaluation with NUM_THREADS-1 to future work.
       */
       PRIORITY_INHERITANCE_INIT(&/*? me.interface.name ?*/_info, /*? num_threads ?*/,
           CAMKES_CONST_ATTR(/*? me.interface.name ?*/_priority))

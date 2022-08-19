@@ -14,7 +14,8 @@
     To do so, we define a Notification_Node,
     which couples a notification object to a priority.
     This allows multiple notification objects,
-    on which threads are waiting, to be inserted into a data-structure in priority order.
+    on which threads are waiting, to be inserted into a data-structure in priority order
+    (we use a max-heap, allowing for quasilinear time complexity on insertion and removal).
 
     The Notification_Node also has previous and next pointers,
     allowing it to be used as a node in a variety of containers
@@ -34,6 +35,10 @@
 
     Once a thread wakes from waiting,
     it pops its Notification Node from the head of the priority queue.
+
+    For more details, see the associated paper
+    (available at https://www.sudvarg.com/priority-aware-camkes/)
+    or the README.
 */
 
 #pragma once

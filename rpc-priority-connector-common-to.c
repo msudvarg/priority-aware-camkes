@@ -1,11 +1,13 @@
 /*
- * Copyright 2017, Data61, CSIRO (ABN 41 687 119 230)
  *
- * SPDX-License-Identifier: BSD-2-Clause
+ * rpc-priority-connector-common-to.c
  * 
- * msudvarg:
- * All code taken, except where noted,
+ * All code taken, except where noted (with a priority-extensions label),
  * from the seL4 camkes-tool repo, /camkes/templates/rpc-connector-common-to.c
+ * 
+ * Implements common RPC connector (recipient side) functionality,
+ * with additions for the priority-aware concurrency framework extensions.
+ * 
  */
 
 /*- import 'helpers/error.c' as error with context -*/
@@ -152,11 +154,11 @@ int /*- if passive -*/
                         }
                         
                         /*
-                            msudvarg:
+                            priority-extensions:
 
-                            Get priority from function parameter.
+                            Call hook for priority protocol prior to CPI procedure function run.
+                            Extracts priority from function/message parameter.
                         */
-                        //Call hook for priority protocol prior to function run
                         priority_pre(*p_priority_ptr, &/*? me.interface.name ?*/_info);
 
                         /* Call the implementation */
@@ -211,11 +213,9 @@ int /*- if passive -*/
                         /*-- endfor -*/
 
                         /*
-                            msudvarg:
+                            priority-extensions:
 
-                            Call hook for priority protocol after function run
-
-                            TODO: Is it appropriate to call it here?
+                            Call hook for priority protocol after CPI procedure function run
                         */
                         priority_post(&/*? me.interface.name ?*/_info);
 
