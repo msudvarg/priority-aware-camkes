@@ -87,6 +87,26 @@ void /*? me.interface.name ?*/__init(void) {
       /*? raise(TemplateError('Invalid attribute "%s" for %s, must be one of "propagated", "inherited", "fixed"' % (priority_protocol, attr), me.parent)) ?*/
     /*- endif -*/
 
+    /*
+      Verify that this is not PIP -> PIP or PIP -> Propagated
+      Does not yet work: a nested component has a "uses" and a "provides" which are not easily linked.
+      We could check all "provides" for a component that connects, via "uses," to a non-fixed-type interface,
+      then raise a warning if any "provides" is type inherited,
+      but the CAmkES parser does not support checking to verify which interface calls which,
+      so we can't raise an error to stop compilation.
+      We defer this to future work.
+    /*- if priority_protocol != "fixed" -*/
+      /*- for from_end in me.parent.from_ends -*/
+        /*- set from_attr = '%s_priority_protocol' % from_end.interface.name -*/      
+        /*- set from_priority_protocol = configuration[from_end.instance.name].get(from_attr) -*/
+        /*- if from_priority_protocol == "inherited" -*/
+          /*? raise(TemplateError('Invalid connection from "%s.%s" to "%s.%s", interface of type "propagated" can only send RPC requests to interfaces of type "fixed"'
+            % (from_end.instance.name, from_end.interface.name, me.instance.name, me.interface.name), me.parent)) ?*/
+        /*- endif -*/
+      /*- endfor -*/
+    /*- endif -*/
+    */
+
     //Initialize the Priority_Protocol struct
 
     priority_protocol_init(&/*? me.interface.name ?*/_info,
