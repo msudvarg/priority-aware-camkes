@@ -59,13 +59,89 @@ While this reduces the number of effective priority levels from 256 to 128, this
 
 Nested locking can be achieved through a chain of requests: a CPI encapsulating one lock can make a request to another CPI encapsulating the second lock.
 
-To guarantee the absence of deadlock one would have to ensure that no cycles exist in the digraph of connections. For a given system specification, CAmkES can generate a digraph representation in the DOT language; this may be used to
-detect cycles, which alert to possible deadlock.
+To guarantee the absence of deadlock one would have to ensure that no cycles exist in the digraph of connections. For a given system specification, CAmkES can generate a digraph representation in the DOT language; this may be used to detect cycles, which alert to possible deadlock.
 
 Currently, our framework does not support nested PIP; a CPI implementing PIP can only send requests to a CPI implementing NPCS or IPCP.
 
 ## Installation and Use
 
+The `priority-protocols-sample` directory contains a sample CAmkES application system that serves as a guide to the installation and use of our library.
+
+To get started, you will need to already have CAmkES, as well as the associated build tools, on your system. Follow the instructions at https://docs.sel4.systems/projects/camkes/ for more information.
+
+The easiest way to use our extensions in the context of the existing CAmkES buildsystem is to clone this repository directly into the CAmkES directory, then copy the sample application into the `projects/camkes/apps/` directory. For example, if you following the linked instructions for downloading CAmkES, navigate into the `camkes-project` directory, then:
+
+    git clone https://github.com/msudvarg/priority-aware-camkes
+    cp -r priority-aware-camkes/priority-protocols-sample/ projects/camkes/apps/
+
+You can then use the `priority-protocols-sample` as a starting point for your own project. To build it, use the same instructions for building and running a sample application that are provided in the instructions linked above, but change the `-DCAMKES_APP=adder` argument to `-DCAMKES_APP=priority-protocols-sample`.
+
+### The Sample Application
+
+If you successfully build and run the sample application, you've done everything right! The application will rapidly output to the terminal as each task releases jobs. You should see something like:
+
+    Task t4: 40^0=1
+    Task t2: 30^0=1
+    Task t3: 20^0=1
+    Task t1: 10^0=1
+    Task t4: 40^1=40
+    Task t4: 40^2=1600
+    Task t2: 30^1=30
+    ...
+    
+This will continue indefinitely until you kill the system (e.g., by closing the QEMU monitor, or, if terminal based, using `CTRL+a` then `c`).
+
+The sample application implements four tasks in originating components:
+
+* t1, period = 1000ms, priority = 10
+* t2, period =  200ms, priority = 30
+* t3, period =  500ms, priority = 20
+* t4, period =  100ms, priority = 40
+
+Periodic dispatch is implemented within each component, which registers a timeout to a common TimeServer component, provided as part of the CAmkES global-components repository. We provide a fork of this repository (https://github.com/msudvarg/global-components/) that adds support for the BCM2837 chip (used in the Raspberry Pi Model 3B and 3B+, later versions of the Raspberry Pi Model 2B, and the Raspberry Pi Compute Module 3).
+
+The component layout is illustrated roughly as:
+
+    t1 -----v
+    		propagation ----|
+    t2 -----^				v
+    						ipcp
+    t3 -----v				^
+    		pip ------------|
+    t4 -----^
+
+Here, tasks t1 and t2 request a common CPI implementing pip (in a component of type ServiceForwarder), tasks t3 and t4 request a common CPI implementing priority propagation (in a component of type ServiceForwarder), and the common CPIs forward nested requests to a common CPI implementing ipcp (in a component of type ServiceTerminator).
+
+Priorities are set according to our laddering scheme, and threadpools are appropriately sized
+
+Each task registers a periodic timeout with a CAmkES TimeServer global component. At each job release, it increments a component-local iterations variable, then prints the result of raising task priority to that number of iterations. The power is implemented as a request to a ServiceForwarder component, which itself forwards the request to the ServiceTerminator.
+
+### Usage Details
+
+
+
+### Build Considerations
+
+The sample application's `CMakeLists.txt` illustrates some of the subtleties of using our library. Notice that any components implementing one of our protocols must be linked to the appropriate source files. At a minimum, `priority-protocols.c` is needed; for any implementing PIP, `priority-inheritance.c` and `notification-manager.c` must also be linked.
+
+Additionally, because (as previously stated) a different connector type is necessary for each threadpool size, we have to both add the path to the templates using `CAmkESAddTemplatesPath("../priority-aware-camkes")`, as well as declare the connectors for each size. To prevent mistakes if threadpools need to be later resized in the component specification, we do this using a `foreach` loop to support threadpools of up to 100 threads.
+
+Various include and import directives within the code are structured under the assumption that you implement your CAmkES system by building off of the provided sample application built according to the above instructions. If you take a different approach (e.g., via a different directory structure), you'll need to make sure that the include and import paths are all structured correctly.
+
+The following paths are all relative to the `build` directory:
+
+* `priority-protocols-sample/CMakeLists.txt`:
+    * `DeclareCAmkESComponent` sources
+    * `CAmkESAddTemplatesPath`
+* `priority-protocols-sample/task-system.camkes`:
+    * `#include ... priority-protocols.camkes.h`
+* `seL4RPCCallPrioritized-to.template.c`:
+    *  `#include ... priority-protocols.h`
+ 
+The following, however, is relative to the file from which it is referenced:
+
+* `priority-protocols-sample/task-system.camkes`:
+    * `import ... priority-connectors.camkes`
 
 
 ## System Digraph Analysis
