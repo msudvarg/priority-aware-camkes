@@ -20,6 +20,7 @@ int r_pow(const int base, int exp, const int priority) {
     int res = 1;
     while (exp > 0) {
         res *= base;
+        exp--;
     }
     return res;
 }
