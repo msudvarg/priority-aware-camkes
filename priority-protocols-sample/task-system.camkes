@@ -26,11 +26,11 @@
 	Component Layout:
 
 	t1 -----v
-			propagation ----v
+			propagation ----|
 	t2 -----^				v
 							ipcp
 	t3 -----v				^
-			pip ------------^
+			pip ------------|
 	t4 -----^
 
 	Priorities are set according to our laddering scheme, and threadpools are appropriately sized
