@@ -112,13 +112,47 @@ The component layout is illustrated roughly as:
 
 Here, tasks t1 and t2 request a common CPI implementing pip (in a component of type ServiceForwarder), tasks t3 and t4 request a common CPI implementing priority propagation (in a component of type ServiceForwarder), and the common CPIs forward nested requests to a common CPI implementing ipcp (in a component of type ServiceTerminator).
 
-Priorities are set according to our laddering scheme, and threadpools are appropriately sized
+Priorities are set according to our laddering scheme, and threadpools are appropriately sized.
 
 Each task registers a periodic timeout with a CAmkES TimeServer global component. At each job release, it increments a component-local iterations variable, then prints the result of raising task priority to that number of iterations. The power is implemented as a request to a ServiceForwarder component, which itself forwards the request to the ServiceTerminator.
 
 ### Usage Details
 
+We assume that a user of our framework is already familiar with CAmkES. If not, the CAmkES manual is available from https://docs.sel4.systems/projects/camkes/manual.html.
 
+Our framework requires few changes to an existing CAmkES specification. Primarily, to assign one of our priority protocols to a procedure interface, connections to that interface will need to be over one of the `seL4RPCCallPrioritizedN` connector types that we supply, where `N` is the size of the associated threadpool (see the __Overview__ above for details). The interface will then need the following attributes:
+
+    attribute int NAME_num_threads;
+    attribute int NAME_priority;
+    attribute string NAME_priority_protocol;
+
+Here, `NAME` is to be replaced with the name of the procedure interface.
+
+To help prevent parameter reuse (as the threadpool size must be set for both the `NAME_num_threads` attribute and the connector type), and to ease the assignment of these attributes, we provide several macros in the `priority-protocols.camkes.h` header. In our sample applications system specification (`task-system.camkes`), you can see how these macros are used:
+
+* A threadpool size is defined for each interface using a C-style macro declaration
+* The appropriate connector type is selected by using the rpc() function macro, which takes the threadpool-size constant macro as its parameter
+* The `NAME_num_threads` attributes are set using the same constant macro
+
+The `NAME_priority` parameter for each procedure interface, as well as the `_priority` parameter for each active (task) component, must be explicitly declared and assigned a value (see the discussion of priority laddering under the __Round Robin Scheduling__ subsection of the __Overview__ for more details). By explicitly declaring the attribute, CAmkES will make it available as a constant in the underlying C code. Failure to do so will cause a compilation error. We also provide the `task_priority_attributes()` macro (which takes no argument) to be added to task component specifications.
+
+The `NAME_priority_protocol` can take one of 3 values: "propagated", "inherited", or "fixed" (which enables either IPCP or NPCS, depending on the assigned priority). Failure to supply one of these 3 values will result in compilation error.
+
+You'll also notice, in `task-system.camkes`, that any procedures provided by interfaces using our library must include priority as the last parameter of any function signatures, e.g.:
+
+	int pow(in int base, in int exponent, in int priority);
+	
+When defining the corresponding function in a component's backing C code, be sure to include this in the signature as well (though you do not need to use the variable in the function).
+
+When calling the function, however, you do need to pass the appropriate priority via the function call. The priority depends on what is calling the function:
+
+* Task Component: `_priority` (pass the task's priority)
+* Priority Propagation: `priority` (pass the request priority)
+* Fixed Priority (IPCP or NPCS): `NAME_priority` (pass the priority assigned to the CPI) 
+* PIP: Does not matter. PIP should *only* send priority-based requests to fixed priority CPIs. However, *if* you want to pass the priority as information, you can use:
+    * `NAME_priority` (pass the priority assigned to the CPI)
+    * `priority` (pass the request priority)
+    * `lock->inherited_priority` (pass the current inherited priority)
 
 ### Build Considerations
 
@@ -151,3 +185,5 @@ Development of a tool to analyze the system digraph is underway. Soon, you will 
 * Identification of request cycles, indicating possible deadlock
 * Determining the maximum priority among all requesters (HLP) to assign CPI thread/threadpool priorities
 * Counting the number of tasks that request a shared CPI to assign threadpool sizes
+
+For now, CAmkES automatically creates a system digraph representation in the DOT language, which you can analyze by hand or with the tool of your choice. The file is under the build directory, and is named `graph.dot`
