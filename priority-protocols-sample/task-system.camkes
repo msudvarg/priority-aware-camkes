@@ -43,7 +43,7 @@ import <global-connectors.camkes>; //Get connectors for TimeServer
 
 //Get macros and connectors for priority protocols
 #include "../priority-aware-camkes/priority-protocols.camkes.h"
-import "../priority-aware-camkes/priority-connectors.camkes";
+import "../../../../priority-aware-camkes/priority-connectors.camkes";
 
 
 procedure Request {
