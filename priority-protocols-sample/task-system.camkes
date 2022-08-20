@@ -35,42 +35,45 @@
 
 	Priorities are set according to our laddering scheme, and threadpools are appropriately sized
 
-/*
+*/
 
 import <std_connector.camkes>; //Get standard connectors
 import <TimeServer/TimeServer.camkes>; //TimeServer component for dispatching periodic tasks
 import <global-connectors.camkes>; //Get connectors for TimeServer
 
 //Get macros and connectors for priority protocols
-#include "../priority-protocols.camkes.h"
-import "../priority-connectors.camkes";
+#include "../priority-aware-camkes/priority-protocols.camkes.h"
+import "../priority-aware-camkes/priority-connectors.camkes";
 
 
 procedure Request {
-	int pow(in int base, int int exponent, in int priority);
+	int pow(in int base, in int exponent, in int priority);
 }
 
 component Task {
 	control;
-	consumes PeriodicTask t;
-	task_priority_attributes();
+
+	uses Timer timeout;
+	task_priority_attributes()
 	attribute int period_ms;
+
+	uses Request r;
 }
 
 component ServiceForwarder {
 	provides Request r;
-	interface_priority_attributes(r);
+	interface_priority_attributes(r)
 	uses Request r_nest;
 }
 
 component ServiceTerminator {
 	provides Request r;
-	interface_priority_attributes(r);
+	interface_priority_attributes(r)
 }
 
 //Define threadpool sizes
-#define forwarder_num_threads 2;
-#define terminator_num_threads 1;
+#define forwarder_num_threads 2
+#define terminator_num_threads 1
 
 assembly {
 
@@ -94,11 +97,14 @@ assembly {
 		connection rpc(forwarder_num_threads) conn_pip(from t1.r, from t2.r, to pip.r);
 		connection rpc(forwarder_num_threads) conn_propagation(from t3.r, from t4.r, to propagation.r);
 		connection rpc(terminator_num_threads) conn_ipcp(from pip.r_nest, from propagation.r_nest, to ipcp.r);
-		connection seL4TimeServer periodic(from t1.t, from t2.t, from t3.t, from t4.t, to timer.the_timer);
+		connection seL4TimeServer periodic(from t1.timeout, from t2.timeout, from t3.timeout, from t4.timeout, to timer.the_timer);
 
 	}
 
 	configuration {
+
+		//Necessary for timer
+        timer.timers_per_client = 1;
 
 		//Set priorities
 		t1._priority = 10;
@@ -121,7 +127,7 @@ assembly {
 		//Set priority protocols
 		pip.r_priority_protocol = "inherited";
 		propagation.r_priority_protocol = "propagated";
-		ipcp.r_priority_protocol = "static";
+		ipcp.r_priority_protocol = "fixed";
 
 	}
 }

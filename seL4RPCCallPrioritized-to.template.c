@@ -23,7 +23,7 @@
   
   Include necessary declarations from the priority protocols library
 */
-#include "priority-protocols/priority-protocols.h"
+#include "../projects/camkes/apps/priority-aware-camkes/priority-protocols/priority-protocols.h"
 
 /*? macros.show_includes(me.instance.type.includes) ?*/
 /*? macros.show_includes(me.interface.type.includes) ?*/

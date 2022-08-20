@@ -9,6 +9,8 @@
 
 */
 
+#include <camkes.h>
+
 
 int release_count = 0;
 
