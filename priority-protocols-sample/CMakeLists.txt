@@ -34,6 +34,7 @@ DeclareCAmkESComponent (ServiceTerminator SOURCES
     ../priority-aware-camkes/priority-protocols/notification-manager.c
 )
 
+# Add connector templates
 CAmkESAddTemplatesPath("../priority-aware-camkes")
 
 # Declares connectors associated with each threadpool size
