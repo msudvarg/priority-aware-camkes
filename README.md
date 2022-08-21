@@ -104,9 +104,9 @@ The component layout is illustrated roughly as:
 
     t1 -----v
             propagation ----|
-    t2 -----^				v
+    t2 -----^               v
                             ipcp
-    t3 -----v				^
+    t3 -----v               ^
             pip ------------|
     t4 -----^
 
