@@ -103,11 +103,11 @@ Periodic dispatch is implemented within each component, which registers a timeou
 The component layout is illustrated roughly as:
 
     t1 -----v
-    		propagation ----|
+            propagation ----|
     t2 -----^				v
-    						ipcp
+                            ipcp
     t3 -----v				^
-    		pip ------------|
+            pip ------------|
     t4 -----^
 
 Here, tasks t1 and t2 request a common CPI implementing pip (in a component of type ServiceForwarder), tasks t3 and t4 request a common CPI implementing priority propagation (in a component of type ServiceForwarder), and the common CPIs forward nested requests to a common CPI implementing ipcp (in a component of type ServiceTerminator).
