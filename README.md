@@ -120,6 +120,8 @@ Each task registers a periodic timeout with a CAmkES TimeServer global component
 
 We assume that a user of our framework is already familiar with CAmkES. If not, the CAmkES manual is available from https://docs.sel4.systems/projects/camkes/manual.html.
 
+__Component Attributes__
+
 Our framework requires few changes to an existing CAmkES specification. Primarily, to assign one of our priority protocols to a procedure interface, connections to that interface will need to be over one of the `seL4RPCCallPrioritizedN` connector types that we supply, where `N` is the size of the associated threadpool (see the __Overview__ above for details). The interface will then need the following attributes:
 
     attribute int NAME_num_threads;
@@ -138,6 +140,8 @@ The `NAME_priority` parameter for each procedure interface, as well as the `_pri
 
 The `NAME_priority_protocol` can take one of 3 values: "propagated", "inherited", or "fixed" (which enables either IPCP or NPCS, depending on the assigned priority). Failure to supply one of these 3 values will result in compilation error.
 
+__Procedure Interface Function Signatures__
+
 You'll also notice, in `task-system.camkes`, that any procedures provided by interfaces using our library must include priority as the last parameter of any function signatures, e.g.:
 
 	int pow(in int base, in int exponent, in int priority);
@@ -153,6 +157,11 @@ When calling the function, however, you do need to pass the appropriate priority
     * `NAME_priority` (pass the priority assigned to the CPI)
     * `priority` (pass the request priority)
     * `lock->inherited_priority` (pass the current inherited priority)
+
+__Init Function__
+
+For a procedure interface named `NAME`, CAmkES automatically provides a function `NAME__init()` that runs during component initialization, and that must be defined by the user in the component's underlying C code (even if the function body is left blank). Our framework overrides this function; as a result, all instances of `NAME__init()` must be renamed to `NAME_init()` (double underscore changed to single underscore) for any procedure interfaces using our supplied connector types.
+
 
 ### Build Considerations
 
