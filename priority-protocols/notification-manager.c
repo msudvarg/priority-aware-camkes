@@ -51,10 +51,10 @@ void ntfn_mgr_init(struct Notification_Manager * ntfn_mgr, struct Notification_N
 bool ntfn_greater_than(struct Notification_Node * lhs, struct Notification_Node * rhs) {
 
     //The lhs is greater if its priority is greater
-    if(lhs->priority > rhs->priority) return true;
+    if(*(lhs->priority) > *(rhs->priority)) return true;
     
     //The lhs is not greater if its priority is less
-    if(lhs->priority < rhs->priority) return false;
+    if(*(lhs->priority) < *(rhs->priority)) return false;
 
     //If the priorities are equal, compare the insertion orders
     if(lhs->insert_order < rhs->insert_order) return true;
@@ -198,7 +198,27 @@ void ntfn_mgr_pop(struct Notification_Manager * ntfn_mgr) {
 
 }
 
-void ntfn_mgr_wait(int priority, struct Notification_Manager * ntfn_mgr) {
+void ntfn_mgr_update(int priority, char * requestor, struct Notification_Manager * ntfn_mgr) {
+
+    //Search waiters
+    for(int index = 0; index < ntfn_mgr->num_waiters; index++) {
+        struct Notification_Node * node = ntfn_mgr->prio_queue[index];
+
+        //Requestor found
+        if(!strcmp(node->requestor),requestor) {
+            //Update priority
+            *(node->priority) = priority;
+
+            //Reorder heap
+            swap_parent(ntfn_mgr, index);
+
+            //Stop searching
+            break;
+        }
+    }
+}
+
+void ntfn_mgr_wait(int * priority, char * requestor, struct Notification_Manager * ntfn_mgr) {
 
     //Obtain notification object from head of free list
     struct Notification_Node * node = ntfn_mgr->free_list;
@@ -206,6 +226,9 @@ void ntfn_mgr_wait(int priority, struct Notification_Manager * ntfn_mgr) {
 
     //Set notification object priority
     node->priority = priority;
+
+    //Set notification object requestor for identification
+    node->requestor = requestor;
 
     //Insert into priority queue
     ntfn_mgr_insert(ntfn_mgr, node);
@@ -227,7 +250,7 @@ void ntfn_mgr_signal(struct Notification_Manager * ntfn_mgr) {
 }
 
 //The following are for testing purposes
-void ntfn_mgr_simulate_wait(int priority, struct Notification_Manager * ntfn_mgr) {
+void ntfn_mgr_simulate_wait(int * priority, struct Notification_Manager * ntfn_mgr) {
 
     //Obtain notification object from head of free list
     struct Notification_Node * node = ntfn_mgr->free_list;
@@ -241,7 +264,7 @@ void ntfn_mgr_simulate_wait(int priority, struct Notification_Manager * ntfn_mgr
 
 }
 
-void ntfn_mgr_simulate_wait_wake(int priority, struct Notification_Manager * ntfn_mgr) {
+void ntfn_mgr_simulate_wait_wake(int * priority, struct Notification_Manager * ntfn_mgr) {
 
     //Obtain notification object from head of free list
     struct Notification_Node * node = ntfn_mgr->free_list;
