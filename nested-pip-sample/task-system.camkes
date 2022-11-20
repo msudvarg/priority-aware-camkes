@@ -1,0 +1,134 @@
+/*
+
+	task-system.camkes
+
+	CAmkES description for our priority-protocols-sample
+	sample component-based system application
+
+	Implements four tasks in originating components:
+	t1, period = 1000ms, priority = 10
+	t2, period =  200ms, priority = 30
+	t3, period =  500ms, priority = 20
+	t4, period =  100ms, priority = 40
+
+	Periodic dispatch is implemented within each component,
+	which registers a timeout to a common TimeServer component,
+	provided as part of the CAmkES global-components repository.
+	We provide a fork of this repository that adds support for the BCM2837 chip
+	(used in the Raspberry Pi Model 3B and 3B+, later versions of the Raspberry Pi Model 2B,
+	and the Raspberry Pi Compute Module 3)
+	https://github.com/msudvarg/global-components/
+
+	Tasks t1 and t2 request a common CPI implementing pip (in a component of type ServiceForwarder)
+	Tasks t3 and t4 request a common CPI implementing priority propagation (in a component of type ServiceForwarder)
+	These common CPIs forward nested requests to a common CPI implementing ipcp (in a component of type ServiceTerminator)
+
+	Component Layout:
+
+	t1 -----v
+			propagation ----|
+	t2 -----^				v
+							ipcp
+	t3 -----v				^
+			pip ------------|
+	t4 -----^
+
+	Priorities are set according to our laddering scheme, and threadpools are appropriately sized
+
+*/
+
+import <std_connector.camkes>; //Get standard connectors
+import <TimeServer/TimeServer.camkes>; //TimeServer component for dispatching periodic tasks
+import <global-connectors.camkes>; //Get connectors for TimeServer
+
+//Get macros and connectors for priority protocols
+#include "../priority-aware-camkes/priority-protocols.camkes.h"
+import "../../../../priority-aware-camkes/priority-connectors.camkes";
+
+
+procedure Request {
+	int pow(in int base, in int exponent, in int priority, in string requestor);
+	void nest(in int priority, in string requestor);
+}
+
+component Task {
+	control;
+
+	uses Timer timeout;
+	task_priority_attributes()
+	attribute int period_ms;
+
+	uses Request r;
+}
+
+component ServiceForwarder {
+	provides Request r;
+	interface_priority_attributes(r)
+	uses Request r_nest;
+}
+
+component ServiceTerminator {
+	provides Request r;
+	interface_priority_attributes(r)
+}
+
+//Define threadpool sizes
+#define forwarder_num_threads 2
+#define terminator_num_threads 1
+
+assembly {
+
+	composition {
+
+        //Time server for periodic task dispatch
+        component TimeServer timer;     
+
+		//Task components
+		component Task t1;
+		component Task t2;
+		component Task t3;
+		component Task t4;
+
+		//Shared service components
+		component ServiceForwarder pip;
+		component ServiceForwarder propagation;
+		component ServiceTerminator ipcp;
+
+		//Connections
+		connection rpc(forwarder_num_threads) conn_pip(from t1.r, from t2.r, to pip.r);
+		connection rpc(forwarder_num_threads) conn_propagation(from t3.r, from t4.r, to propagation.r);
+		connection rpc(terminator_num_threads) conn_ipcp(from pip.r_nest, from propagation.r_nest, to ipcp.r);
+		connection seL4TimeServer periodic(from t1.timeout, from t2.timeout, from t3.timeout, from t4.timeout, to timer.the_timer);
+
+	}
+
+	configuration {
+
+		//Necessary for timer
+        timer.timers_per_client = 1;
+
+		//Set priorities
+		t1._priority = 10;
+		t1.period_ms = 1000;
+		t2._priority = 30;
+		t2.period_ms = 200;
+		pip.r_priority = 31; //Priority laddering
+		t3._priority = 20;
+		t3.period_ms = 500;
+		t4._priority = 40;
+		t4.period_ms = 100;
+		propagation.r_priority = 40; //Priority laddering
+		ipcp.r_priority = 40; //Priority laddering
+
+		//Set threadpool sizes
+		pip.r_num_threads = forwarder_num_threads;
+		propagation.r_num_threads = forwarder_num_threads;
+		ipcp.r_num_threads = terminator_num_threads;
+
+		//Set priority protocols
+		pip.r_priority_protocol = "inherited";
+		propagation.r_priority_protocol = "propagated";
+		ipcp.r_priority_protocol = "fixed";
+
+	}
+}
