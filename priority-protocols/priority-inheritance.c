@@ -32,6 +32,7 @@ void priority_inheritance_init(struct Priority_Protocol * info,
         //Initialize fields of Priority_Inheritance object
         lock->locked = false;
         lock->num_threads = num_threads;
+        lock->nest_fn = NULL;
 
 #ifdef DEBUG
         printf("initialized priority inheritance lock with %d threads\n", num_threads);
@@ -40,33 +41,66 @@ void priority_inheritance_init(struct Priority_Protocol * info,
     }
 }
 
+void inherit(struct Priority_Inheritance * lock, int request_priority) {
+
+    //Allow running thread to inherit waiter's priority
+    //(2)
+    if(request_priority > lock->inherited_priority) {
+
+        lock->inherited_priority = request_priority; //(3)
+#ifdef DEBUG
+        printf("Setting priority of runner TCB %d\n", lock->runner_tcb);
+#endif
+
+        //(4)
+        int error = seL4_TCB_SetPriority(lock->runner_tcb, lock->runner_tcb, request_priority);
+        ZF_LOGF_IFERR(error, "Failed to set runner's priority to %d.\n", request_priority);
+
+        nest_send(request_priority, lock);
+    }
+}
+
+/*
+    nest_send
+
+    Supports nested priority inheritance.
+    If a request is pending,
+    forwards the elevated priority to the request endpoint
+*/
+void nest_send(int request_priority, struct Priority_Inheritance * lock) {
+    if (lock->nest_fn) lock->nest_fn(request_priority, lock->requestor);
+}
+
+void priority_inheritance_nest_rcv(int request_priority, const char * requestor, struct Priority_Inheritance * lock) {
+
+    //Not lockholder, search ntfn mgr
+    if (strcmp(lock->requestor, requestor)) {
+        ntfn_mgr_update(request_priority, requestor, &lock->ntfn_mgr);
+    }
+
+    inherit(lock, request_priority);
+}
+
 /*
     priority_inheritance_enter
     
     Begins the Priority Inheritance Protocol,
     should run before the endpoint handler code.
 */
-void priority_inheritance_enter(int request_priority, struct Priority_Protocol * info) {
+void priority_inheritance_enter(int request_priority, char * requestor, struct Priority_Protocol * info) {
 
     struct Priority_Inheritance * lock = info->pip;
 
     //Check if we can obtain the lock.
     //No while loop needed: when we wake up, lock is guaranteed to be available.
+    //(1)
     if(lock->locked) {
         //The lock is locked
 
-        //Allow running thread to inherit waiter's priority
-        if(request_priority > lock->inherited_priority) {
-            lock->inherited_priority = request_priority;
-#ifdef DEBUG
-            printf("Setting priority of runner TCB %d\n", lock->runner_tcb);
-#endif
-            int error = seL4_TCB_SetPriority(lock->runner_tcb, lock->runner_tcb, request_priority);
-            ZF_LOGF_IFERR(error, "Failed to set runner's priority to %d.\n", request_priority);
-        }
+        inherit(lock, request_priority);
 
         //Wait on a notification object
-        ntfn_mgr_wait(request_priority, &lock->ntfn_mgr);
+        ntfn_mgr_wait(&request_priority, requestor, &lock->ntfn_mgr);
 
     }
 
@@ -76,6 +110,7 @@ void priority_inheritance_enter(int request_priority, struct Priority_Protocol *
     //Set the inherited priority and TCB to our parameters
     lock->inherited_priority = request_priority;
     lock->runner_tcb = camkes_get_tls()->tcb_cap;
+    strcpy(lock->requestor, requestor);
 
     //Demote priority to run request code
     demote_priority(request_priority);

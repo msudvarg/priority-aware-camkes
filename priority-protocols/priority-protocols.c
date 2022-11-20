@@ -49,7 +49,7 @@ void set_priority(int priority) {
     These call different functions depending on the protocol used.
 */
 
-void priority_pre(int request_priority, struct Priority_Protocol * info) {
+void priority_pre(int request_priority, char * requestor, struct Priority_Protocol * info) {
     if (info->priority_protocol == propagated) {
         //Demote to request priority
         demote_priority(request_priority);
@@ -57,7 +57,7 @@ void priority_pre(int request_priority, struct Priority_Protocol * info) {
 
     else if (info->priority_protocol == inherited) {
         //Enter priority inheritance
-        priority_inheritance_enter(request_priority, info);
+        priority_inheritance_enter(request_priority, requestor, info);
     }
 
     //Fixed priority is a no-op
@@ -81,5 +81,29 @@ void priority_post(struct Priority_Protocol * info) {
     //Fixed priority is a no-op
     else {
         return;
+    }
+}
+
+void nested_pre(void (*nest_fn)(int, const char*), struct Priority_Protocol * info) {
+    if (info->priority_protocol == inherited) {
+        //Promote to original HLP
+        promote_priority(info->priority_ceiling);
+
+        //Set function pointer to request's nest method
+        info->pip->nest_fn = nest_fn;
+    }
+
+}
+
+void nested_post(struct Priority_Protocol * info) {
+    if(info->priority_protocol == inherited) {
+        //Demote back to executing inherited priority
+        demote_priority(info->pip->inherited_priority);
+    }
+}
+
+void nest_rcv(int request_priority, const char * requestor, struct Priority_Protocol * info) {
+    if(info->priority_protocol == inherited) {
+        priority_inheritance_nest_rcv(request_priority, requestor, info->pip);
     }
 }
