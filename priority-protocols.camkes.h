@@ -49,7 +49,7 @@
 
 #pragma once
 
-//Stringification to select of appropriate RPC connector according the thread pool size
+//Stringification to select appropriate RPC connector according the thread pool size
 #define rpc_token(num_threads) seL4RPCCallPrioritized##num_threads
 #define rpc(num_threads) rpc_token(num_threads)
 
