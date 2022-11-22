@@ -60,4 +60,4 @@
 
 #define task_priority_attributes() \
     attribute int _priority;
-    attribute int requestor;
+    attribute int requestor = __COUNTER__;
