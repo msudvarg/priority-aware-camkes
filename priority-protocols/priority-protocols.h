@@ -73,7 +73,8 @@ void priority_post(int requestor, struct Priority_Protocol * info);
     Pre and Post functions,
     which should run before and after a request is made along a nested PIP path.
 */
-void nested_pre(int requestor, void (*nest_fn)(const int, const int), struct Priority_Protocol * info);
+void nested_pre(int * msg_priorioty, int requestor,
+        void (*nest_fn)(const int, const int), struct Priority_Protocol * info);
 void nested_post(int requestor, struct Priority_Protocol * info);
 
 void nest_rcv(int request_priority, int requestor, struct Priority_Protocol * info);

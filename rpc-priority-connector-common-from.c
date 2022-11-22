@@ -79,6 +79,15 @@
             return;
         /*-- endif -*/
     }
+
+    /*
+        priority-extensions:
+
+        Get priority protocol specified by component attribute
+    */
+
+    /*- set attr = '%s_priority_protocol' % me.interface.name -*/
+    /*- set priority_protocol = configuration[me.instance.name].get(attr) -*/
                         
     /*
         priority-extensions:
@@ -86,7 +95,10 @@
         Call hook for priority protocol prior to CPI procedure function call.
         Elevate priority and set pointer to request endpoint.
     */
-    nested_pre(*p_requestor_ptr, /*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
+   
+    /*- if priority_protocol is not none -*/   
+    nested_pre(p_priority_ptr, *p_requestor_ptr, /*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
+    /*- endif -*/
 
     /*? perform_call(connector, "size", "length", namespace_prefix='rpc_') ?*/
 

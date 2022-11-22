@@ -114,7 +114,7 @@ void priority_propagation_nest_rcv(int request_priority, int requestor, struct P
 }
 
 
-void priority_propagation_nested_pre(int requestor,
+void priority_propagation_nested_pre(int * msg_priority, int requestor,
         void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
     //Promote to original HLP
@@ -124,7 +124,10 @@ void priority_propagation_nested_pre(int requestor,
     struct Propagated_Thread * thread = info->prop->active_list;
     while (thread->requestor != requestor) {
         thread = thread->next;
-    }
+    }    
+
+    //Set message priority to current inherited priority
+    *msg_priority = thread->priority;
 
     //Set function pointer
     thread->nest_fn = nest_fn;

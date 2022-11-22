@@ -19,5 +19,5 @@ void r_init(void) {
 }
 
 int r_pow(const int base, const int exp, const int priority, const int requestor) {
-    return r_nest_pow(base, exp, priority, requestor);
+    return r_nest_pow(base, exp, 0, requestor); //Priority is set by protocol wrapper functions
 }

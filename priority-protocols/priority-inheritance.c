@@ -131,11 +131,14 @@ void priority_inheritance_exit(struct Priority_Protocol * info) {
     //Reply and wait implicit after function return
 }
 
-void priority_inheritance_nested_pre(void (*nest_fn)(const int, const int),
-        struct Priority_Protocol * info) {
+void priority_inheritance_nested_pre(int * msg_priority,
+        void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
     //Promote to original HLP
     promote_priority(info->priority_ceiling);
+
+    //Set message priority to current inherited priority
+    *msg_priority = info->pip->inherited_priority;
 
     //Set function pointer to request's nest method
     info->pip->nest_fn = nest_fn;

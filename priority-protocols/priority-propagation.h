@@ -48,6 +48,6 @@ void priority_propagation_exit(int requestor, struct Priority_Protocol * info);
 
 void priority_propagation_nest_rcv(int request_priority, int requestor, struct Priority_Propagation * prop);
 
-void priority_propagation_nested_pre(int requestor,
+void priority_propagation_nested_pre(int * msg_priority, int requestor,
         void (*nest_fn)(const int, const int), struct Priority_Protocol * info);
 void priority_propagation_nested_post(int requestor, struct Priority_Protocol * info);

@@ -85,16 +85,21 @@ void priority_post(int requestor, struct Priority_Protocol * info) {
     }
 }
 
-void nested_pre(int requestor,
+void nested_pre(int * msg_priority, int requestor,
         void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
     if (info->priority_protocol == inherited) {
-        priority_inheritance_nested_pre(nest_fn, info);
+        priority_inheritance_nested_pre(msg_priority, nest_fn, info);
         return;
     }
 
     if (info->priority_protocol == propagated) {
-        priority_propagation_nested_pre(requestor, nest_fn, info);
+        priority_propagation_nested_pre(msg_priority, requestor, nest_fn, info);
+        return;
+    }
+
+    if (info->priority_protocol == fixed) {
+        *msg_priority = info->priority_ceiling;
         return;
     }
 
