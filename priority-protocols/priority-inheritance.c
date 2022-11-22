@@ -56,20 +56,11 @@ void inherit(struct Priority_Inheritance * lock, int request_priority) {
         int error = seL4_TCB_SetPriority(lock->runner_tcb, lock->runner_tcb, request_priority);
         ZF_LOGF_IFERR(error, "Failed to set runner's priority to %d.\n", request_priority);
 
-        nest_send(request_priority, lock);
+        //If a request is pending, forward elevated priority to request endpoint
+        if (lock->nest_fn) lock->nest_fn(request_priority, lock->requestor);
     }
 }
 
-/*
-    nest_send
-
-    Supports nested priority inheritance.
-    If a request is pending,
-    forwards the elevated priority to the request endpoint
-*/
-void nest_send(int request_priority, struct Priority_Inheritance * lock) {
-    if (lock->nest_fn) lock->nest_fn(request_priority, lock->requestor);
-}
 
 void priority_inheritance_nest_rcv(int request_priority, const char * requestor, struct Priority_Inheritance * lock) {
 
