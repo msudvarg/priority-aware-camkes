@@ -130,5 +130,11 @@ assembly {
 		propagation.r_priority_protocol = "propagated";
 		ipcp.r_priority_protocol = "fixed";
 
+		//Set task IDs
+		t1.requestor = __COUNTER__;
+		t2.requestor = __COUNTER__;
+		t3.requestor = __COUNTER__;
+		t4.requestor = __COUNTER__;
+
 	}
 }

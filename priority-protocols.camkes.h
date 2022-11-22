@@ -59,5 +59,5 @@
     attribute string name##_priority_protocol;
 
 #define task_priority_attributes() \
-    attribute int _priority;
-    attribute int requestor = __COUNTER__;
+    attribute int _priority; \
+    attribute int requestor;

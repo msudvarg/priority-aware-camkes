@@ -14,6 +14,7 @@
 
 #include "priority-protocols.h"
 #include "priority-inheritance.h"
+#include "priority-propagation.h"
 
 #include <camkes.h>
 #include <camkes/tls.h>

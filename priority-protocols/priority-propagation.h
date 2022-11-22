@@ -32,7 +32,7 @@ struct Priority_Propagation {
     struct Propagated_Thread * free_list;
 
     unsigned arr_size;
-}
+};
 
 #define PRIORITY_PROPAGATION_INIT(PRIORITY_PROTOCOL_PTR, NUM_THREADS) \
     static struct Priority_Propagation prop; \

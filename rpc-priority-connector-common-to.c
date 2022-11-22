@@ -217,7 +217,7 @@ int /*- if passive -*/
 
                             Call hook for priority protocol after CPI procedure function run
                         */
-                        priority_post(&/*? me.interface.name ?*/_info);
+                        priority_post(*p_requestor_ptr, &/*? me.interface.name ?*/_info);
 
                         /* Check if there was an error during marshalling. We do
                          * this after freeing internal parameter variables to avoid

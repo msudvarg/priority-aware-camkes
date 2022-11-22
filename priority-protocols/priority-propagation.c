@@ -114,7 +114,7 @@ void priority_propagation_nest_rcv(int request_priority, int requestor, struct P
 }
 
 
-void priority_inheritance_nested_pre(int requestor,
+void priority_propagation_nested_pre(int requestor,
         void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
     //Promote to original HLP
@@ -131,7 +131,7 @@ void priority_inheritance_nested_pre(int requestor,
 
 }
 
-void priority_inheritance_nested_post(int requestor, struct Priority_Protocol * info) {
+void priority_propagation_nested_post(int requestor, struct Priority_Protocol * info) {
 
     //Find node
     struct Propagated_Thread * thread = info->prop->active_list;

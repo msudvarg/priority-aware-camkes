@@ -23,6 +23,7 @@ DeclareCAmkESComponent (Task SOURCES
 DeclareCAmkESComponent (ServiceForwarder SOURCES
     service-forwarder.c
     ../priority-aware-camkes/priority-protocols/priority-protocols.c
+    ../priority-aware-camkes/priority-protocols/priority-propagation.c
     ../priority-aware-camkes/priority-protocols/priority-inheritance.c
     ../priority-aware-camkes/priority-protocols/notification-manager.c
 )
@@ -30,6 +31,7 @@ DeclareCAmkESComponent (ServiceForwarder SOURCES
 DeclareCAmkESComponent (ServiceTerminator SOURCES
     service-terminator.c
     ../priority-aware-camkes/priority-protocols/priority-protocols.c
+    ../priority-aware-camkes/priority-protocols/priority-propagation.c
     ../priority-aware-camkes/priority-protocols/priority-inheritance.c
     ../priority-aware-camkes/priority-protocols/notification-manager.c
 )
