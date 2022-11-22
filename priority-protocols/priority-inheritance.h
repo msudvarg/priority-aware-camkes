@@ -34,7 +34,7 @@ struct Priority_Inheritance {
     Calls the priority_inheritance_init function to initialize
     the Priority_Inheritance object.
 */
-#define PRIORITY_INHERITANCE_INIT(PRIORITY_PROTOCOL_PTR, NUM_THREADS, PRIORITY) \
+#define PRIORITY_INHERITANCE_INIT(PRIORITY_PROTOCOL_PTR, NUM_THREADS) \
     static struct Priority_Inheritance lock; \
     priority_inheritance_init(PRIORITY_PROTOCOL_PTR, \
             &lock, NUM_THREADS);

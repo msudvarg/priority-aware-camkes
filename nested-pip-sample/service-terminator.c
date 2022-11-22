@@ -12,6 +12,9 @@
 
 #include <camkes.h>
 
+#include "nest.h"
+NEST(r)
+
 void r_init(void) {
 
 }

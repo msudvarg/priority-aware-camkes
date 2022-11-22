@@ -69,6 +69,9 @@ void priority_propagation_enter(int request_priority, int requestor, struct Prio
 }
 
 void priority_propagation_exit(int requestor, struct Priority_Protocol * info) {
+
+    //Promote back to original HLP
+    promote_priority(info->priority_ceiling);
     
     struct Priority_Propagation * prop = info->prop;
 
@@ -81,16 +84,13 @@ void priority_propagation_exit(int requestor, struct Priority_Protocol * info) {
     }
 
     //Clear node
-    thread->runner_tcb = NULL;
+    thread->runner_tcb = 0;
 
     //Return to free list
     if(back) back->next = thread->next;
     else prop->active_list = thread->next;
     thread->next = prop->free_list;
     prop->free_list = thread;
-
-    //Promote back to original HLP
-    promote_priority(info->priority_ceiling);
 
 }
 

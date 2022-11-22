@@ -122,9 +122,21 @@ void /*? me.interface.name ?*/__init(void) {
         We currently use NUM_THREADS for safety.
         We defer analysis and evaluation with NUM_THREADS-1 to future work.
       */
-      PRIORITY_INHERITANCE_INIT(&/*? me.interface.name ?*/_info, /*? num_threads ?*/,
-          CAMKES_CONST_ATTR(/*? me.interface.name ?*/_priority))
-      NOTIFICATION_MANAGER_INIT(&/*? me.interface.name ?*/_info.pip->ntfn_mgr, ntfn_objs, /*? num_threads ?*/);
+      PRIORITY_INHERITANCE_INIT(&/*? me.interface.name ?*/_info, /*? num_threads ?*/)
+      NOTIFICATION_MANAGER_INIT(&/*? me.interface.name ?*/_info.pip->ntfn_mgr, ntfn_objs, /*? num_threads ?*/)
+    /*- endif -*/
+    
+    /*- if priority_protocol == "propagated" -*/    
+
+      //Get the number of threads specified by component attribute
+
+      /*- set attr = '%s_num_threads' % me.interface.name -*/
+      /*- set num_threads = int(configuration[me.instance.name].get(attr)) -*/
+
+      /*
+        Initialize Priority_Propagation object
+      */
+      PRIORITY_PROPAGATION_INIT(&/*? me.interface.name ?*/_info, /*? num_threads ?*/) 
     /*- endif -*/
 
     /*? me.interface.name ?*/_init();
