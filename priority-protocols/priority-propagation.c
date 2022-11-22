@@ -59,6 +59,7 @@ void priority_propagation_enter(int request_priority, int requestor, struct Prio
 
     //Set its info
     thread->requestor = requestor;
+    thread->priority = request_priority;
     thread->nest_fn = NULL;
     thread->runner_tcb = camkes_get_tls()->tcb_cap;
 
@@ -103,6 +104,7 @@ void priority_propagation_nest_rcv(int request_priority, int requestor, struct P
     }
 
     //Set priority
+    thread->priority = request_priority;
     int error = seL4_TCB_SetPriority(thread->runner_tcb, thread->runner_tcb, request_priority);
     ZF_LOGF_IFERR(error, "Failed to set runner's priority to %d.\n", request_priority);
 
@@ -141,6 +143,6 @@ void priority_inheritance_nested_post(int requestor, struct Priority_Protocol * 
     thread->nest_fn = NULL;
 
     //Demote back to executing inherited priority
-    demote_priority();
+    demote_priority(thread->priority);
 
 }
