@@ -198,14 +198,14 @@ void ntfn_mgr_pop(struct Notification_Manager * ntfn_mgr) {
 
 }
 
-void ntfn_mgr_update(int priority, char * requestor, struct Notification_Manager * ntfn_mgr) {
+void ntfn_mgr_update(int priority, int requestor, struct Notification_Manager * ntfn_mgr) {
 
     //Search waiters
     for(int index = 0; index < ntfn_mgr->num_waiters; index++) {
         struct Notification_Node * node = ntfn_mgr->prio_queue[index];
 
         //Requestor found
-        if(!strcmp(node->requestor),requestor) {
+        if(node->requestor == requestor) {
             //Update priority
             *(node->priority) = priority;
 
@@ -218,7 +218,7 @@ void ntfn_mgr_update(int priority, char * requestor, struct Notification_Manager
     }
 }
 
-void ntfn_mgr_wait(int * priority, char * requestor, struct Notification_Manager * ntfn_mgr) {
+void ntfn_mgr_wait(int * priority, int requestor, struct Notification_Manager * ntfn_mgr) {
 
     //Obtain notification object from head of free list
     struct Notification_Node * node = ntfn_mgr->free_list;

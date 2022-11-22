@@ -16,7 +16,7 @@ void r_init(void) {
 
 }
 
-int r_pow(const int base, int exp, const int priority, const char * requestor) {
+int r_pow(const int base, int exp, const int priority, const int requestor) {
     int res = 1;
     while (exp > 0) {
         res *= base;

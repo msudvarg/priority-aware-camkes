@@ -62,10 +62,10 @@ void inherit(struct Priority_Inheritance * lock, int request_priority) {
 }
 
 
-void priority_inheritance_nest_rcv(int request_priority, const char * requestor, struct Priority_Inheritance * lock) {
+void priority_inheritance_nest_rcv(int request_priority, int requestor, struct Priority_Inheritance * lock) {
 
     //Not lockholder, search ntfn mgr
-    if (strcmp(lock->requestor, requestor)) {
+    if (lock->requestor != requestor) {
         ntfn_mgr_update(request_priority, requestor, &lock->ntfn_mgr);
     }
 
@@ -78,7 +78,7 @@ void priority_inheritance_nest_rcv(int request_priority, const char * requestor,
     Begins the Priority Inheritance Protocol,
     should run before the endpoint handler code.
 */
-void priority_inheritance_enter(int request_priority, char * requestor, struct Priority_Protocol * info) {
+void priority_inheritance_enter(int request_priority, int requestor, struct Priority_Protocol * info) {
 
     struct Priority_Inheritance * lock = info->pip;
 
@@ -101,7 +101,7 @@ void priority_inheritance_enter(int request_priority, char * requestor, struct P
     //Set the inherited priority and TCB to our parameters
     lock->inherited_priority = request_priority;
     lock->runner_tcb = camkes_get_tls()->tcb_cap;
-    strcpy(lock->requestor, requestor);
+    lock_requestor = requestor;
 
     //Demote priority to run request code
     demote_priority(request_priority);

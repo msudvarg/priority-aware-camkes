@@ -2,6 +2,6 @@
 #define NEST_token(INTERFACE) INTERFACE##_nest
 #define INFO_token(INTERFACE) INTERFACE##_info
 #define NEST(INTERFACE) \
-    void NEST_token(INTERFACE)(const int priority, const char * requestor) { \
+    void NEST_token(INTERFACE)(const int priority, const int requestor) { \
         nest_rcv(priority, requestor, & INFO_token(INTERFACE)); \
     }

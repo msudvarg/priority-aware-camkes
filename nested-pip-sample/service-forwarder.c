@@ -15,6 +15,6 @@ void r_init(void) {
 
 }
 
-int r_pow(const int base, const int exp, const int priority, const char * requestor) {
+int r_pow(const int base, const int exp, const int priority, const int requestor) {
     return r_nest_pow(base, exp, priority, requestor);
 }

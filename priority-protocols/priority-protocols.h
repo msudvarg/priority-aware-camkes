@@ -64,14 +64,14 @@ static inline void promote_priority(int original_priority) {
     which should run at the beginning and end of the interface handler function.
     These call different functions depending on the protocol used.
 */
-void priority_pre(int request_priority, char * requestor, struct Priority_Protocol * info);
+void priority_pre(int request_priority, int requestor, struct Priority_Protocol * info);
 void priority_post(struct Priority_Protocol * info);
 
 /*
     Pre and Post functions,
     which should run before and after a request is made along a nested PIP path.
 */
-void nested_pre(void (*nest_fn)(int, const char*), struct Priority_Protocol * info);
+void nested_pre(void (*nest_fn)(const int, const int), struct Priority_Protocol * info);
 void nested_post(struct Priority_Protocol * info);
 
-void nest_rcv(int request_priority, const char * requestor, struct Priority_Protocol * info);
+void nest_rcv(int request_priority, int requestor, struct Priority_Protocol * info);

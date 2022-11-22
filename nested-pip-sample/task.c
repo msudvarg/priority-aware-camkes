@@ -19,7 +19,7 @@ void task(void) {
     printf("Task %s: %d^%d=%d\n",
         get_instance_name(), _priority,
         release_count,
-        r_pow(_priority, release_count, _priority, get_instance_name()));
+        r_pow(_priority, release_count, _priority, requestor));
 
     release_count++;
 

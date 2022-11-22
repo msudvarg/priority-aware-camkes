@@ -47,8 +47,8 @@ import "../../../../priority-aware-camkes/priority-connectors.camkes";
 
 
 procedure Request {
-	int pow(in int base, in int exponent, in int priority, in string requestor);
-	void nest(in int priority, in string requestor);
+	int pow(in int base, in int exponent, in int priority, in int requestor);
+	void nest(in int priority, in int requestor);
 }
 
 component Task {
@@ -129,6 +129,12 @@ assembly {
 		pip.r_priority_protocol = "inherited";
 		propagation.r_priority_protocol = "propagated";
 		ipcp.r_priority_protocol = "fixed";
+
+		//Set task IDs
+		t1.requestor = __COUNTER__;
+		t2.requestor = __COUNTER__;
+		t3.requestor = __COUNTER__;
+		t4.requestor = __COUNTER__;
 
 	}
 }

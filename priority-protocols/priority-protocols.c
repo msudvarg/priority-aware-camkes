@@ -49,7 +49,7 @@ void set_priority(int priority) {
     These call different functions depending on the protocol used.
 */
 
-void priority_pre(int request_priority, char * requestor, struct Priority_Protocol * info) {
+void priority_pre(int request_priority, int requestor, struct Priority_Protocol * info) {
     if (info->priority_protocol == propagated) {
         //Demote to request priority
         demote_priority(request_priority);
@@ -102,7 +102,7 @@ void nested_post(struct Priority_Protocol * info) {
     }
 }
 
-void nest_rcv(int request_priority, const char * requestor, struct Priority_Protocol * info) {
+void nest_rcv(int request_priority, int requestor, struct Priority_Protocol * info) {
     if(info->priority_protocol == inherited) {
         priority_inheritance_nest_rcv(request_priority, requestor, info->pip);
     }

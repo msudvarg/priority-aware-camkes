@@ -159,7 +159,7 @@ int /*- if passive -*/
                             Call hook for priority protocol prior to CPI procedure function run.
                             Extracts priority from function/message parameter.
                         */
-                        priority_pre(*p_priority_ptr, p_requestor_ptr, &/*? me.interface.name ?*/_info);
+                        priority_pre(*p_priority_ptr, *p_requestor_ptr, &/*? me.interface.name ?*/_info);
 
                         /* Call the implementation */
                         /*-- set ret = "%s_ret" % (m.name) -*/

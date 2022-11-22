@@ -18,10 +18,10 @@ struct Priority_Inheritance {
     bool initialized;
     seL4_Word inherited_priority;
     seL4_CPtr runner_tcb;
-    void (*nest_fn)(int, const char*);
+    int requestor;
+    void (*nest_fn)(const int, const int);
     struct Notification_Manager ntfn_mgr;
     unsigned num_threads;
-    char requestor[256];
 };
 
 /*
@@ -48,9 +48,9 @@ void priority_inheritance_init(struct Priority_Protocol * info,
     called from priority_pre and priority_post functions of priority-protocols.h
     if Priority Inheritance Protocol is being used.
 */
-void priority_inheritance_enter(int priority, char * requestor, struct Priority_Protocol * info);
+void priority_inheritance_enter(int priority, int requestor, struct Priority_Protocol * info);
 
 void priority_inheritance_exit(struct Priority_Protocol * info);
 
 void priority_inheritance_nest_send(int request_priority, struct Priority_Inheritance * lock);
-void priority_inheritance_nest_rcv(int request_priority, const char * requestor, struct Priority_Inheritance * lock);
+void priority_inheritance_nest_rcv(int request_priority, int requestor, struct Priority_Inheritance * lock);

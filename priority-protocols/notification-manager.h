@@ -47,7 +47,7 @@
 
 struct Notification_Node {
     seL4_Word * priority;
-    char * requestor;
+    int requestor;
     unsigned long long insert_order;
     seL4_CPtr ntfn_obj;
     struct Notification_Node * next;
@@ -101,10 +101,10 @@ void ntfn_mgr_init(struct Notification_Manager * ntfn_mgr, struct Notification_N
         struct Notification_Node ** prio_queue, seL4_CPtr * ntfn_objs, unsigned arr_size);
 
 //Wait on the Notification Manager as if it's a Notification Object
-void ntfn_mgr_wait(int * priority, char * requestor, struct Notification_Manager * ntfn_mgr);
+void ntfn_mgr_wait(int * priority, int requestor, struct Notification_Manager * ntfn_mgr);
 
 //Update priority for a node in the Notification Manager
-void ntfn_mgr_update(int priority, char * requestor, struct Notification_Manager * ntfn_mgr);
+void ntfn_mgr_update(int priority, int requestor, struct Notification_Manager * ntfn_mgr);
 
 //Signal on the Notification Manager as if it's a Notification Object
 void ntfn_mgr_signal(struct Notification_Manager * ntfn_mgr);
