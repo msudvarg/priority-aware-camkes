@@ -28,9 +28,11 @@ struct Priority_Protocol {
     int priority_protocol;
     int priority_ceiling;
     struct Priority_Inheritance * pip;
+    struct Priority_Propagation * prop;
 };
 
 #include "priority-inheritance.h"
+#include "priority-propagation.h"
 
 //Initialize a Priority_Protocol structure
 void priority_protocol_init(struct Priority_Protocol * info,
@@ -65,13 +67,13 @@ static inline void promote_priority(int original_priority) {
     These call different functions depending on the protocol used.
 */
 void priority_pre(int request_priority, int requestor, struct Priority_Protocol * info);
-void priority_post(struct Priority_Protocol * info);
+void priority_post(int requestor, struct Priority_Protocol * info);
 
 /*
     Pre and Post functions,
     which should run before and after a request is made along a nested PIP path.
 */
-void nested_pre(void (*nest_fn)(const int, const int), struct Priority_Protocol * info);
-void nested_post(struct Priority_Protocol * info);
+void nested_pre(int requestor, void (*nest_fn)(const int, const int), struct Priority_Protocol * info);
+void nested_post(int requestor, struct Priority_Protocol * info);
 
 void nest_rcv(int request_priority, int requestor, struct Priority_Protocol * info);

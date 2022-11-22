@@ -86,7 +86,7 @@
         Call hook for priority protocol prior to CPI procedure function call.
         Elevate priority and set pointer to request endpoint.
     */
-    nested_pre(/*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
+    nested_pre(*p_requestor_ptr, /*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
 
     /*? perform_call(connector, "size", "length", namespace_prefix='rpc_') ?*/
 
@@ -96,7 +96,7 @@
         Call hook for priority protocol after CPI procedure function call.
         Demote priority and clear pointer to request endpoint.
     */
-    nested_post(&/*? me.interface.name ?*/_info);
+    nested_post(*p_requestor_ptr, &/*? me.interface.name ?*/_info);
 
     /* Unmarshal the response */
     int err = /*? marshal.call_unmarshal_output('%s_unmarshal_outputs' % m.name, connector.recv_buffer, "size", output_parameters, m.return_type, "return_ptr", namespace_prefix='p_') ?*/;

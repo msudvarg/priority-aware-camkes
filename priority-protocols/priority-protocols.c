@@ -51,8 +51,8 @@ void set_priority(int priority) {
 
 void priority_pre(int request_priority, int requestor, struct Priority_Protocol * info) {
     if (info->priority_protocol == propagated) {
-        //Demote to request priority
-        demote_priority(request_priority);
+        //Enter priority propagation
+        priority_propagation_enter(request_priority, requestor, info);
     }
 
     else if (info->priority_protocol == inherited) {
@@ -67,10 +67,10 @@ void priority_pre(int request_priority, int requestor, struct Priority_Protocol 
 
 }
 
-void priority_post(struct Priority_Protocol * info) {
+void priority_post(int requestor, struct Priority_Protocol * info) {
     if (info->priority_protocol == propagated) {
-        //Promote back to original HLP
-        promote_priority(info->priority_ceiling);
+        //Leave priority propagation
+        priority_propagation_exit(requestor, info);
     }
 
     else if (info->priority_protocol == inherited) {
@@ -84,26 +84,38 @@ void priority_post(struct Priority_Protocol * info) {
     }
 }
 
-void nested_pre(void (*nest_fn)(int, const char*), struct Priority_Protocol * info) {
-    if (info->priority_protocol == inherited) {
-        //Promote to original HLP
-        promote_priority(info->priority_ceiling);
+void nested_pre(int requestor,
+        void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
-        //Set function pointer to request's nest method
-        info->pip->nest_fn = nest_fn;
+    if (info->priority_protocol == inherited) {
+        priority_inheritance_nested_pre(nest_fn, info);
+        return;
+    }
+
+    if (info->priority_protocol == propagated) {
+        priority_propagation_nested_pre(requestor, nest_fn, info);
+        return;
     }
 
 }
 
-void nested_post(struct Priority_Protocol * info) {
+void nested_post(int requestor, struct Priority_Protocol * info) {
+
     if(info->priority_protocol == inherited) {
-        //Demote back to executing inherited priority
-        demote_priority(info->pip->inherited_priority);
+        priority_inheritance_nested_post(info);
+        return;
+    }
+
+    if(info->priority_protocol == propagated) {
+        priority_propagation_nested_post(requestor, info);
     }
 }
 
 void nest_rcv(int request_priority, int requestor, struct Priority_Protocol * info) {
     if(info->priority_protocol == inherited) {
         priority_inheritance_nest_rcv(request_priority, requestor, info->pip);
+    }
+    if(info->priority_protocol == propagated) {
+        priority_propagation_nest_rcv(request_priority, requestor, info->prop);
     }
 }

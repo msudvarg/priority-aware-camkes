@@ -52,5 +52,8 @@ void priority_inheritance_enter(int priority, int requestor, struct Priority_Pro
 
 void priority_inheritance_exit(struct Priority_Protocol * info);
 
-void priority_inheritance_nest_send(int request_priority, struct Priority_Inheritance * lock);
 void priority_inheritance_nest_rcv(int request_priority, int requestor, struct Priority_Inheritance * lock);
+
+void priority_inheritance_nested_pre(void (*nest_fn)(const int, const int),
+        struct Priority_Protocol * info);
+void priority_inheritance_nested_post(struct Priority_Protocol * info);

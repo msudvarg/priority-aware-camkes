@@ -101,7 +101,7 @@ void priority_inheritance_enter(int request_priority, int requestor, struct Prio
     //Set the inherited priority and TCB to our parameters
     lock->inherited_priority = request_priority;
     lock->runner_tcb = camkes_get_tls()->tcb_cap;
-    lock_requestor = requestor;
+    lock->requestor = requestor;
 
     //Demote priority to run request code
     demote_priority(request_priority);
@@ -129,4 +129,25 @@ void priority_inheritance_exit(struct Priority_Protocol * info) {
     ntfn_mgr_signal(&info->pip->ntfn_mgr);
 
     //Reply and wait implicit after function return
+}
+
+void priority_inheritance_nested_pre(void (*nest_fn)(const int, const int),
+        struct Priority_Protocol * info) {
+
+    //Promote to original HLP
+    promote_priority(info->priority_ceiling);
+
+    //Set function pointer to request's nest method
+    info->pip->nest_fn = nest_fn;
+
+}
+
+void priority_inheritance_nested_post(struct Priority_Protocol * info) {
+
+    //Clear nest function
+    info->pip->nest_fn = NULL;
+
+    //Demote back to executing inherited priority
+    demote_priority(info->pip->inherited_priority);
+    
 }
