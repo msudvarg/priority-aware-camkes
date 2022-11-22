@@ -112,13 +112,13 @@ assembly {
 		t1.period_ms = 1000;
 		t2._priority = 30;
 		t2.period_ms = 200;
-		pip.r_priority = 31; //Priority laddering
 		t3._priority = 20;
 		t3.period_ms = 500;
 		t4._priority = 40;
 		t4.period_ms = 100;
-		propagation.r_priority = 40; //Priority laddering
-		ipcp.r_priority = 40; //Priority laddering
+		pip.r_priority = 31; //Priority laddering
+		propagation.r_priority = 41; //Priority laddering
+		ipcp.r_priority = 41; //Priority laddering
 
 		//Set threadpool sizes
 		pip.r_num_threads = forwarder_num_threads;

@@ -36,7 +36,7 @@ struct Priority_Propagation {
 
 #define PRIORITY_PROPAGATION_INIT(PRIORITY_PROTOCOL_PTR, NUM_THREADS) \
     static struct Priority_Propagation prop; \
-    static struct Propagated_Thread threads[ARR_SIZE]; \
+    static struct Propagated_Thread threads[NUM_THREADS]; \
     priority_propagation_init(PRIORITY_PROTOCOL_PTR, &prop, threads, NUM_THREADS);
 
 void priority_propagation_init(struct Priority_Protocol * info,
