@@ -159,7 +159,9 @@ int /*- if passive -*/
                             Call hook for priority protocol prior to CPI procedure function run.
                             Extracts priority from function/message parameter.
                         */
-                        priority_pre(*p_priority_ptr, *p_requestor_ptr, &/*? me.interface.name ?*/_info);
+                        /*- if m.name != "nest" -*/
+                            priority_pre(*p_priority_ptr, *p_requestor_ptr, &/*? me.interface.name ?*/_info);
+                        /*- endif -*/
 
                         /* Call the implementation */
                         /*-- set ret = "%s_ret" % (m.name) -*/
@@ -217,7 +219,9 @@ int /*- if passive -*/
 
                             Call hook for priority protocol after CPI procedure function run
                         */
-                        priority_post(*p_requestor_ptr, &/*? me.interface.name ?*/_info);
+                        /*- if m.name != "nest" -*/
+                            priority_post(*p_requestor_ptr, &/*? me.interface.name ?*/_info);
+                        /*- endif -*/
 
                         /* Check if there was an error during marshalling. We do
                          * this after freeing internal parameter variables to avoid
