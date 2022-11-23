@@ -87,7 +87,7 @@
     */
 
     /*- set attr = '%s_priority_protocol' % me.interface.name -*/
-    /*- set priority_protocol = configuration[me.instance.name].get(attr) -*/
+    /*- set priority_protocol = configuration[me.interface.name].get(attr) -*/
                         
     /*
         priority-extensions:
@@ -97,7 +97,9 @@
     */
    
     /*- if priority_protocol is not none -*/   
-    nested_pre(p_priority_ptr, *p_requestor_ptr, /*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
+    void (*/*? me.interface.name ?*/_nest)(const int, const int);
+    extern struct Priority_Protocol /*? me.interface.name ?*/_info;
+    nested_pre(&p_priority, p_requestor, /*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
     /*- endif -*/
 
     /*? perform_call(connector, "size", "length", namespace_prefix='rpc_') ?*/
@@ -108,7 +110,10 @@
         Call hook for priority protocol after CPI procedure function call.
         Demote priority and clear pointer to request endpoint.
     */
-    nested_post(*p_requestor_ptr, &/*? me.interface.name ?*/_info);
+    /*- if priority_protocol is not none -*/   
+    extern struct Priority_Protocol /*? me.interface.name ?*/_info;
+    nested_post(&p_requestor, &/*? me.interface.name ?*/_info);
+    /*- endif -*/
 
     /* Unmarshal the response */
     int err = /*? marshal.call_unmarshal_output('%s_unmarshal_outputs' % m.name, connector.recv_buffer, "size", output_parameters, m.return_type, "return_ptr", namespace_prefix='p_') ?*/;

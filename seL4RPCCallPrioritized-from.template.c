@@ -62,9 +62,6 @@
 /*
   priority-extensions:
 
-  The following code, up to (but not including) the final endif,
-  is added to support the priority protocols
+  Include RPC priority connector template instead of default RPC connector template
 */
-
-//Include RPC priority connector template instead of default RPC connector template
 /*- include 'rpc-priority-connector-common-from.c' -*/
