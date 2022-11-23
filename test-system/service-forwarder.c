@@ -20,5 +20,5 @@ void r_init(void) {
 
 int r_pow(const int base, const int exp, int priority, const int requestor) {
     printf("Received request from %d with priority %d\n", requestor, priority);
-    return REQUEST(r, r_nest_pow, int, base, exp);
+    return REQUEST(r, r_nest_pow, base, exp);
 }

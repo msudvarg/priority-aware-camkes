@@ -11,9 +11,9 @@
         nest_rcv(priority, requestor, & INFO_token(INTERFACE)); \
     }
     
-#define REQUEST(INTERFACE,fn,fntype,...) ( { \
+#define REQUEST(INTERFACE,fn,...) ( { \
     nested_pre(&priority, requestor, NEST_token(INTERFACE), & INFO_token(INTERFACE)); \
-    fntype retval = fn(__VA_ARGS__, priority, requestor); \
+    __auto_type retval = fn(__VA_ARGS__, priority, requestor); \
     nested_post(requestor, & INFO_token(INTERFACE)); \
     retval; } )
     
