@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../priority-aware-camkes/priority-protocols/priority-protocols.h"
+#include "../priority-aware-camkes/priority-protocols/priority-protocols.h"
 
 //Stringification to define nest method for CPI based on interface name
 #define NEST_token(INTERFACE) INTERFACE##_nest
