@@ -62,9 +62,7 @@ void priority_pre(int request_priority, int requestor, struct Priority_Protocol 
     }
 
     //Fixed priority is a no-op
-    else {
-        return;
-    }
+    else return;
 
 }
 
@@ -80,48 +78,54 @@ void priority_post(int requestor, struct Priority_Protocol * info) {
     }
 
     //Fixed priority is a no-op
-    else {
-        return;
-    }
+    else return;
 }
 
 void nested_pre(int * msg_priority, int requestor,
         void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
-    if (info->priority_protocol == inherited) {
-        priority_inheritance_nested_pre(msg_priority, nest_fn, info);
-        return;
-    }
-
     if (info->priority_protocol == propagated) {
         priority_propagation_nested_pre(msg_priority, requestor, nest_fn, info);
-        return;
     }
 
-    if (info->priority_protocol == fixed) {
-        *msg_priority = info->priority_ceiling;
-        return;
+    else if (info->priority_protocol == inherited) {
+        priority_inheritance_nested_pre(msg_priority, nest_fn, info);
     }
+
+    else if (info->priority_protocol == fixed) {
+        *msg_priority = info->priority_ceiling;
+    }
+
+    else return;
 
 }
 
 void nested_post(int requestor, struct Priority_Protocol * info) {
 
-    if(info->priority_protocol == inherited) {
-        priority_inheritance_nested_post(info);
-        return;
-    }
-
     if(info->priority_protocol == propagated) {
         priority_propagation_nested_post(requestor, info);
     }
+
+    else if(info->priority_protocol == inherited) {
+        priority_inheritance_nested_post(info);
+    }
+
+    //Fixed priority is a no-op
+    else return;
+    
 }
 
 void nest_rcv(int request_priority, int requestor, struct Priority_Protocol * info) {
-    if(info->priority_protocol == inherited) {
-        priority_inheritance_nest_rcv(request_priority, requestor, info->pip);
-    }
+
     if(info->priority_protocol == propagated) {
         priority_propagation_nest_rcv(request_priority, requestor, info->prop);
     }
+
+    else if(info->priority_protocol == inherited) {
+        priority_inheritance_nest_rcv(request_priority, requestor, info->pip);
+    }
+
+    //Fixed priority is a no-op
+    else return;
+
 }
