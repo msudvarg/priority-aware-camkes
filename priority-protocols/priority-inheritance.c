@@ -52,11 +52,11 @@ void inherit(struct Priority_Inheritance * lock, int request_priority) {
         printf("Setting priority of runner TCB %d\n", lock->runner_tcb);
 #endif
 
-        //(4)
+        //(4) Set inherited priority
         int error = seL4_TCB_SetPriority(lock->runner_tcb, lock->runner_tcb, request_priority);
         ZF_LOGF_IFERR(error, "Failed to set runner's priority to %d.\n", request_priority);
 
-        //If a request is pending, forward elevated priority to request endpoint
+        //(5) If a request is pending, forward elevated priority to request endpoint
         if (lock->nest_fn) lock->nest_fn(request_priority, lock->requestor);
     }
 }
@@ -64,11 +64,12 @@ void inherit(struct Priority_Inheritance * lock, int request_priority) {
 
 void priority_inheritance_nest_rcv(int request_priority, int requestor, struct Priority_Inheritance * lock) {
 
-    //Not lockholder, search ntfn mgr
+    //(25) Not lockholder, search ntfn mgr
     if (lock->requestor != requestor) {
         ntfn_mgr_update(request_priority, requestor, &lock->ntfn_mgr);
     }
 
+    //(2)-(5)
     inherit(lock, request_priority);
 }
 
@@ -88,25 +89,31 @@ void priority_inheritance_enter(int request_priority, int requestor, struct Prio
     if(lock->locked) {
         //The lock is locked
 
+        //(2)-(5)
         inherit(lock, request_priority);
 
-        //Wait on a notification object
+        //(6)-(8) Wait on a notification object
         ntfn_mgr_wait(&request_priority, requestor, &lock->ntfn_mgr);
 
     }
 
-    //We obtain the lock
+    //(9) We obtain the lock
     lock->locked = true;
 
     //Set the inherited priority and TCB to our parameters
-    lock->inherited_priority = request_priority;
-    lock->runner_tcb = camkes_get_tls()->tcb_cap;
-    lock->requestor = requestor;
+    //Note: request_priority is appropriately updated from upstream nest
+    //even if the thread was waiting in ntfn mgr.
+    //ntfn mgr holds a pointer to the variable on the stack,
+    //and the stack frame persists across the call and return from wait
+    lock->inherited_priority = request_priority; //(10)
+    lock->runner_tcb = camkes_get_tls()->tcb_cap; //(11)
+    lock->requestor = requestor; //(12)
+    lock->nest_fn = NULL; //(13)
 
-    //Demote priority to run request code
+    //(14) Demote priority to run request code
     demote_priority(request_priority);
 
-    //Component-defined interface function now runs
+    //(15) Component-defined interface function now runs
 }
 
 
@@ -119,38 +126,40 @@ void priority_inheritance_enter(int request_priority, int requestor, struct Prio
 */
 void priority_inheritance_exit(struct Priority_Protocol * info) {
 
-    //Promote priority
+    //(22) Promote priority
     promote_priority(info->priority_ceiling);
 
-    //Mark unlocked
+    //(23) Mark unlocked
     info->pip->locked = false;
 
-    //Signal waiters
+    //(24) Signal waiters
     ntfn_mgr_signal(&info->pip->ntfn_mgr);
 
-    //Reply and wait implicit after function return
+    //(25) Reply and wait implicit after function return
 }
 
 void priority_inheritance_nested_pre(int * msg_priority,
         void (*nest_fn)(const int, const int), struct Priority_Protocol * info) {
 
-    //Promote to original HLP
+    //(16) Promote to original HLP
     promote_priority(info->priority_ceiling);
 
-    //Set message priority to current inherited priority
+    //(17) Set message priority to current inherited priority
     *msg_priority = info->pip->inherited_priority;
 
-    //Set function pointer to request's nest method
+    //(18) Set function pointer to request's nest method
     info->pip->nest_fn = nest_fn;
+
+    //(19) Nested request function now runs
 
 }
 
 void priority_inheritance_nested_post(struct Priority_Protocol * info) {
 
-    //Clear nest function
+    //(20) Clear nest function
     info->pip->nest_fn = NULL;
 
-    //Demote back to executing inherited priority
+    //(21) Demote back to executing inherited priority
     demote_priority(info->pip->inherited_priority);
     
 }
