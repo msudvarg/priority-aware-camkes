@@ -120,7 +120,7 @@ void /*? me.interface.name ?*/__init(void) {
         It might be possible to implement the notification manager
         with NUM_THREADS-1 notification nodes.
         We currently use NUM_THREADS for safety.
-        We defer analysis and evaluation with NUM_THREADS-1 to future work.
+        We defer analysis and evaluation with NUM_THREADS-1 to future work (TODO).
       */
       PRIORITY_INHERITANCE_INIT(&/*? me.interface.name ?*/_info, /*? num_threads ?*/)
       NOTIFICATION_MANAGER_INIT(&/*? me.interface.name ?*/_info.pip->ntfn_mgr, ntfn_objs, /*? num_threads ?*/)

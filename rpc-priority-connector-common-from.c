@@ -83,36 +83,33 @@
     /*
         priority-extensions:
 
-        Get priority protocol specified by component attribute
-    */
+        Get priority protocol of recipient CPI at other end
+        TODO: Right now it only works if the connection has a single to_end
+        For example, this works:
+            conn_propagation(from t3.r, from t4.r, to propagation.r);
+        But this does not:
+            conn_propagation(from t3.r, from t4.r, to propagation.r, to ipcp.r);
 
-    /*- set attr = '%s_priority_protocol' % me.interface.name -*/
-    /*- set priority_protocol = configuration[me.interface.name].get(attr) -*/
+    */
+    /*- if len(me.parent.to_ends) > 1 -*/
+    /*? raise(TemplateError('Priority framework does not support connectors with multiple "to" ends', me.parent)) ?*/
+    /*- endif -*/
+    /*- set to_end = me.parent.to_ends[0] -*/
+    /*- set attr = '%s_priority_protocol' % to_end.interface.name -*/
+    /*- set priority_protocol = configuration[to_end.instance.name].get(attr) -*/
                         
     /*
         priority-extensions:
 
-        Call hook for priority protocol prior to CPI procedure function call.
-        Elevate priority and set pointer to request endpoint.
-    */
-   
-    /*- if priority_protocol is not none -*/   
-    void (*/*? me.interface.name ?*/_nest)(const int, const int);
-    extern struct Priority_Protocol /*? me.interface.name ?*/_info;
-    nested_pre(&p_priority, p_requestor, /*? me.interface.name ?*/_nest,  &/*? me.interface.name ?*/_info);
-    /*- endif -*/
+        Do not perform nest call to fixed priority interface
+    */   
+    /*- if m.name != "nest" or priority_protocol != "fixed" -*/
 
     /*? perform_call(connector, "size", "length", namespace_prefix='rpc_') ?*/
 
     /*
         priority-extensions:
-
-        Call hook for priority protocol after CPI procedure function call.
-        Demote priority and clear pointer to request endpoint.
     */
-    /*- if priority_protocol is not none -*/   
-    extern struct Priority_Protocol /*? me.interface.name ?*/_info;
-    nested_post(&p_requestor, &/*? me.interface.name ?*/_info);
     /*- endif -*/
 
     /* Unmarshal the response */

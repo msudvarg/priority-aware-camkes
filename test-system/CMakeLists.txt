@@ -42,7 +42,7 @@ CAmkESAddTemplatesPath("../priority-aware-camkes")
 # Declares connectors associated with each threadpool size
 foreach(i RANGE 1 100)
     DeclareCAmkESConnector(seL4RPCCallPrioritized${i}
-        FROM seL4RPCCall-from.template.c
+        FROM seL4RPCCallPrioritized-from.template.c
         TO seL4RPCCallPrioritized-to.template.c
     )
 endforeach()
