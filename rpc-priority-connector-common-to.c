@@ -158,6 +158,8 @@ int /*- if passive -*/
 
                             Call hook for priority protocol prior to CPI procedure function run.
                             Extracts priority from function/message parameter.
+
+                            nest method should not call these hooks
                         */
                         /*- if m.name != "nest" -*/
                             priority_pre(*p_priority_ptr, *p_requestor_ptr, &/*? me.interface.name ?*/_info);
@@ -218,6 +220,7 @@ int /*- if passive -*/
                             priority-extensions:
 
                             Call hook for priority protocol after CPI procedure function run
+                            nest method should not call these hooks
                         */
                         /*- if m.name != "nest" -*/
                             priority_post(*p_requestor_ptr, &/*? me.interface.name ?*/_info);
