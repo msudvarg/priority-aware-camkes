@@ -43,6 +43,8 @@
 
 #pragma once
 
+#define DEBUG
+
 #include <camkes.h>
 
 struct Notification_Node {

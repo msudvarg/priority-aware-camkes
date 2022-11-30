@@ -14,6 +14,8 @@
 
 #pragma once
 
+#define DEBUG
+
 #include <camkes.h>
 
 //These are the priority protocols we support

@@ -208,6 +208,9 @@ void ntfn_mgr_update(int priority, int requestor, struct Notification_Manager * 
         if(node->requestor == requestor) {
             //Update priority
             *(node->priority) = priority;
+#ifdef DEBUG
+            printf("PIP: updated waiting thread in ntfn mgr %d to priority %d\n", requestor, priority);
+#endif
 
             //Reorder heap
             swap_parent(ntfn_mgr, index);

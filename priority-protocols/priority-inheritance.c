@@ -35,7 +35,7 @@ void priority_inheritance_init(struct Priority_Protocol * info,
         lock->nest_fn = NULL;
 
 #ifdef DEBUG
-        printf("initialized priority inheritance lock with %d threads\n", num_threads);
+        printf("(0) PIP initialized with %d threads at priority %d\n", num_threads, info->priority_ceiling);
 #endif
 
     }
@@ -47,24 +47,32 @@ void inherit(struct Priority_Inheritance * lock, int request_priority) {
     //(2)
     if(request_priority > lock->inherited_priority) {
 
-        lock->inherited_priority = request_priority; //(3)
 #ifdef DEBUG
-        printf("Setting priority of runner TCB %d\n", lock->runner_tcb);
+        printf("(3) PIP: elevating priority from %d to %d\n", lock->runner_tcb, request_priority);
 #endif
+        lock->inherited_priority = request_priority; //(3)
 
         //(4) Set inherited priority
         int error = seL4_TCB_SetPriority(lock->runner_tcb, lock->runner_tcb, request_priority);
         ZF_LOGF_IFERR(error, "Failed to set runner's priority to %d.\n", request_priority);
 
         //(5) If a request is pending, forward elevated priority to request endpoint
-        if (lock->nest_fn) lock->nest_fn(request_priority, lock->requestor);
+        if (lock->nest_fn) {
+#ifdef DEBUG
+            printf("(5) PIP: forwarding new priority %d to downstream\n", request_priority);
+#endif
+            lock->nest_fn(request_priority, lock->requestor);
+        }
     }
 }
 
 
 void priority_inheritance_nest_rcv(int request_priority, int requestor, struct Priority_Inheritance * lock) {
 
-    //(25) Not lockholder, search ntfn mgr
+    //(26) Not lockholder, search ntfn mgr
+#ifdef DEBUG
+    printf("(26) PIP: updating waiting thread %d to priority %d\n", requestor, request_priority);
+#endif
     if (lock->requestor != requestor) {
         ntfn_mgr_update(request_priority, requestor, &lock->ntfn_mgr);
     }
@@ -93,7 +101,13 @@ void priority_inheritance_enter(int request_priority, int requestor, struct Prio
         inherit(lock, request_priority);
 
         //(6)-(8) Wait on a notification object
+#ifdef DEBUG
+        printf("(6) PIP: thread %d entering ntfn mgr with priority %d\n", requestor, request_priority);
+#endif
         ntfn_mgr_wait(&request_priority, requestor, &lock->ntfn_mgr);
+#ifdef DEBUG
+        printf("(8) PIP: thread %d leaving ntfn mgr with priority %d\n", requestor, request_priority);
+#endif
 
     }
 
@@ -110,6 +124,9 @@ void priority_inheritance_enter(int request_priority, int requestor, struct Prio
     lock->requestor = requestor; //(12)
     lock->nest_fn = NULL; //(13)
 
+#ifdef DEBUG
+        printf("(14) PIP: thread %d demoting to priority %d to run\n", requestor, request_priority);
+#endif
     //(14) Demote priority to run request code
     demote_priority(request_priority);
 
@@ -128,6 +145,9 @@ void priority_inheritance_exit(struct Priority_Protocol * info) {
 
     //(22) Promote priority
     promote_priority(info->priority_ceiling);
+#ifdef DEBUG
+        printf("(22) PIP: thread promoted to priority %d to reply\n", info->priority_ceiling);
+#endif
 
     //(23) Mark unlocked
     info->pip->locked = false;
@@ -146,6 +166,9 @@ void priority_inheritance_nested_pre(int * msg_priority,
 
     //(17) Set message priority to current inherited priority
     *msg_priority = info->pip->inherited_priority;
+#ifdef DEBUG
+        printf("(17) PIP: thread setting priority for nested downstream request to %d\n", *msg_priority);
+#endif
 
     //(18) Set function pointer to request's nest method
     info->pip->nest_fn = nest_fn;
@@ -160,6 +183,9 @@ void priority_inheritance_nested_post(struct Priority_Protocol * info) {
     info->pip->nest_fn = NULL;
 
     //(21) Demote back to executing inherited priority
+#ifdef DEBUG
+        printf("(21) PIP: thread demoting to priority %d after nest\n", info->pip->inherited_priority);
+#endif
     demote_priority(info->pip->inherited_priority);
     
 }
