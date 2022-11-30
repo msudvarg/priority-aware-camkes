@@ -57,6 +57,7 @@ component Task {
 	uses Timer timeout;
 	task_priority_attributes()
 	attribute int period_ms;
+	attribute int release_ms;
 
 	uses Request r;
 }
@@ -110,12 +111,16 @@ assembly {
 		//Set priorities
 		t1._priority = 10;
 		t1.period_ms = 1000;
+		t1.release_ms = 0;
 		t2._priority = 30;
 		t2.period_ms = 200;
+		t2.release_ms = 0;
 		t3._priority = 20;
 		t3.period_ms = 500;
+		t3.release_ms = 0;
 		t4._priority = 40;
 		t4.period_ms = 100;
+		t4.release_ms = 0;
 		pip.r_priority = 31; //Priority laddering
 		propagation.r_priority = 41; //Priority laddering
 		ipcp.r_priority = 41; //Priority laddering

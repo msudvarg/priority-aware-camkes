@@ -30,12 +30,18 @@ int run(void) {
     //Register a periodic timeout    
     seL4_CPtr notification = timeout_notification();
     seL4_Word badge;
+
+    if(release_ms > 0) {
+        timeout_oneshot_relative(0, (release_ms * NS_IN_MS));
+        seL4_Wait(notification, &badge);
+    }
+
     timeout_periodic(0, (period_ms * NS_IN_MS));
 
     //Execute task procedure after every release
-    while(1) {
+    do {
         task();
         seL4_Wait(notification, &badge);
-    }
+    } while(0);
 
 }
