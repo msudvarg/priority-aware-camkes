@@ -43,12 +43,12 @@
 
 #pragma once
 
-#define DEBUG
+//#define DEBUG
 
 #include <camkes.h>
 
 struct Notification_Node {
-    seL4_Word * priority;
+    int * priority;
     int requestor;
     unsigned long long insert_order;
     seL4_CPtr ntfn_obj;

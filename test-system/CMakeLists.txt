@@ -12,24 +12,36 @@ project(test-system C)
 
 includeGlobalComponents()
 
-DeclareCAmkESComponent (Task SOURCES
-    task.c
-)
+DeclareCAmkESComponent(RootDispatcher SOURCES root_dispatcher.c)
+
+DeclareCamkesComponent(SystemDispatcher SOURCES system_dispatcher.c)
+
+DeclareCamkesComponent(Dispatcher SOURCES dispatcher.c)
+
+DeclareCAmkESComponent (Task SOURCES task.c)
 
 #
 #   CPIs implementing our library's priority protocols must link the associated C files
 #
 
-DeclareCAmkESComponent (ServiceForwarder SOURCES
-    service-forwarder.c
+DeclareCAmkESComponent (L1 SOURCES
+l1.c
+../priority-aware-camkes/priority-protocols/priority-protocols.c
+../priority-aware-camkes/priority-protocols/priority-propagation.c
+../priority-aware-camkes/priority-protocols/priority-inheritance.c
+../priority-aware-camkes/priority-protocols/notification-manager.c
+)
+
+DeclareCAmkESComponent (L2 SOURCES
+    l2.c
     ../priority-aware-camkes/priority-protocols/priority-protocols.c
     ../priority-aware-camkes/priority-protocols/priority-propagation.c
     ../priority-aware-camkes/priority-protocols/priority-inheritance.c
     ../priority-aware-camkes/priority-protocols/notification-manager.c
 )
 
-DeclareCAmkESComponent (ServiceTerminator SOURCES
-    service-terminator.c
+DeclareCAmkESComponent (L3 SOURCES
+    l3.c
     ../priority-aware-camkes/priority-protocols/priority-protocols.c
     ../priority-aware-camkes/priority-protocols/priority-propagation.c
     ../priority-aware-camkes/priority-protocols/priority-inheritance.c

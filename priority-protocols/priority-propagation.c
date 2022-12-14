@@ -41,7 +41,7 @@ void priority_propagation_init(struct Priority_Protocol * info,
         threads[num_threads - 1].next = NULL;
 
 #ifdef DEBUG
-        printf("(0) Prop initialized with %d threads at priority %d\n", num_threads, info->priority_ceiling);
+        printf("(0) Prop initialized with %d threads at priority %d in %s\n", num_threads, info->priority_ceiling, get_instance_name());
 #endif
 
     }
@@ -64,7 +64,7 @@ void priority_propagation_enter(int request_priority, int requestor, struct Prio
     thread->requestor = requestor; //(5)
 
 #ifdef DEBUG
-        printf("(6) Prop: thread %d demoting to priority %d to run\n", requestor, request_priority);
+        printf("(6) Prop: thread %d demoting to priority %d to run in %s\n", requestor, request_priority, get_instance_name());
 #endif
     //(6) Demote to request priority
     demote_priority(request_priority);
@@ -78,7 +78,7 @@ void priority_propagation_exit(int requestor, struct Priority_Protocol * info) {
     //(14) Promote back to original HLP
     promote_priority(info->priority_ceiling);
 #ifdef DEBUG
-        printf("(14) Prop: thread promoted to priority %d to reply\n", info->priority_ceiling);
+        printf("(14) Prop: thread promoted to priority %d to reply in %s\n", info->priority_ceiling, get_instance_name());
 #endif
     
     struct Priority_Propagation * prop = info->prop;
@@ -115,7 +115,7 @@ void priority_propagation_nest_rcv(int request_priority, int requestor, struct P
 
     //(18) Set priority
 #ifdef DEBUG
-    printf("(18) Prop: updating thread %d to priority %d\n", requestor, request_priority);
+    printf("(18) Prop: updating thread %d to priority %d in %s\n", requestor, request_priority, get_instance_name());
 #endif
     thread->priority = request_priority;
     int error = seL4_TCB_SetPriority(thread->runner_tcb, thread->runner_tcb, request_priority);
@@ -123,7 +123,7 @@ void priority_propagation_nest_rcv(int request_priority, int requestor, struct P
 
     //(19) If a request is pending, forward elevated priority to request endpoint
 #ifdef DEBUG
-    printf("(19) Prop: forwarding new priority %d to downstream\n", request_priority);
+    printf("(19) Prop: forwarding new priority %d to downstream in %s\n", request_priority, get_instance_name());
 #endif
     if (thread->nest_fn) thread->nest_fn(request_priority, requestor);
 
@@ -145,7 +145,7 @@ void priority_propagation_nested_pre(int * msg_priority, int requestor,
     //(9) Set message priority to current inherited priority
     *msg_priority = thread->priority;
 #ifdef DEBUG
-        printf("(9) Prop: thread setting priority for nested downstream request to %d\n", *msg_priority);
+        printf("(9) Prop: thread setting priority for nested downstream request to %d in %s\n", *msg_priority, get_instance_name());
 #endif
 
     //(10) Set function pointer
@@ -168,7 +168,7 @@ void priority_propagation_nested_post(int requestor, struct Priority_Protocol * 
 
     //(13) Demote back to executing inherited priority
 #ifdef DEBUG
-        printf("(13) Prop: thread demoting to priority %d after nest\n", thread->priority);
+        printf("(13) Prop: thread demoting to priority %d after nest in %s\n", thread->priority, get_instance_name());
 #endif
     demote_priority(thread->priority);
 

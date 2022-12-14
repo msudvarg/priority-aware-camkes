@@ -18,7 +18,7 @@
 #define REQUEST(interface_from,interface_to,method,...) ( { \
     extern struct Priority_Protocol INFO_token(interface_from); \
     nested_pre(&priority, requestor, NEST_token(interface_to), & INFO_token(interface_from)); \
-    __auto_type retval = REQUEST_token(interface_to,method)(__VA_ARGS__, priority, requestor); \
+    __auto_type retval = REQUEST_token(interface_to,method)( __VA_ARGS__ __VA_OPT__(,) priority, requestor); \
     nested_post(requestor, & INFO_token(interface_from)); \
     retval; } )
     

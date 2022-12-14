@@ -2,46 +2,15 @@
 
     task.c
 
-    Registers a periodic timeout with a CAmkES TimeServer global component.
-    At each release, increments a global iterations variable,
-    then prints the result of raising task priority to that number of iterations.
-    The power is implemented as a request to a ServiceForwarder component.
-
 */
 
 #include <camkes.h>
+#include "timing_headers/spin.h"
 
+static int misses;
 
-int release_count = 0;
-
-void task(void) {
-
-    printf("Task %s: %d^%d=%d\n",
-        get_instance_name(), _priority,
-        release_count,
-        r_pow(_priority, release_count, _priority, requestor));
-
-    release_count++;
-
-}
-
-int run(void) {
-
-    //Register a periodic timeout    
-    seL4_CPtr notification = timeout_notification();
-    seL4_Word badge;
-
-    if(release_ms > 0) {
-        timeout_oneshot_relative(0, (release_ms * NS_IN_MS));
-        seL4_Wait(notification, &badge);
-    }
-
-    timeout_periodic(0, (period_ms * NS_IN_MS));
-
-    //Execute task procedure after every release
-    do {
-        task();
-        seL4_Wait(notification, &badge);
-    } while(0);
-
+void rd_dispatch(void) {
+    spin(execution_time_pre);
+    r_request(_priority, requestor);
+    spin(execution_time_post);
 }

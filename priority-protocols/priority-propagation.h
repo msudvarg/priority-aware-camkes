@@ -14,7 +14,7 @@
 struct Propagated_Thread {
     seL4_CPtr runner_tcb;
     int requestor;
-    seL4_Word priority;
+    int priority;
     void (*nest_fn)(const int, const int);
     struct Propagated_Thread * next;
 };

@@ -16,7 +16,7 @@
 struct Priority_Inheritance {
     bool locked;
     bool initialized;
-    seL4_Word inherited_priority;
+    int inherited_priority;
     seL4_CPtr runner_tcb;
     int requestor;
     void (*nest_fn)(const int, const int);
