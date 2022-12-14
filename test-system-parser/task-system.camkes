@@ -1,0 +1,90 @@
+/*
+
+	task-system.camkes
+
+*/
+
+import <std_connector.camkes>; //Get standard connectors
+import <TimeServer/TimeServer.camkes>; //TimeServer component for dispatching periodic tasks
+import <global-connectors.camkes>; //Get connectors for TimeServer
+
+
+
+//Define threadpool sizes
+#define forwarder_num_threads 2
+#define terminator_num_threads 1
+
+assembly {
+
+	composition {
+
+        //Time server for periodic task dispatch
+        component TimeServer timer;     
+
+		//Task components
+		component Task t1;
+		component Task t2;
+		component Task t3;
+		component Task t4;
+
+		//Shared service components
+		component ServiceForwarder comp_a;
+		component ServiceForwarder comp_b;
+		component ServiceTerminator comp_c;
+
+		//Connections
+		connection rpc(forwarder_num_threads) conn_a1(from t1.r1, from t2.r1, to comp_a.l1);
+		connection rpc(forwarder_num_threads) conn_a2(from t1.r2, from t2.r2, to comp_a.l2);
+		connection rpc(forwarder_num_threads) conn_b1(from t3.r1, from t4.r1, to comp_b.l1);
+		connection rpc(forwarder_num_threads) conn_b2(from t3.r2, from t4.r2, to comp_b.l2);
+		connection rpc(terminator_num_threads) conn_c(from comp_a.r_nest, from comp_b.r_nest, to comp_c.r);
+		connection seL4TimeServer periodic(from t1.timeout, from t2.timeout, from t3.timeout, from t4.timeout, to timer.the_timer);
+
+	}
+
+	configuration {
+
+		//Necessary for timer
+        timer.timers_per_client = 1;
+
+		//Set priorities
+		t1._priority = 10;
+		t1.period_ms = 1000;
+		t1.release_ms = 0;
+		t2._priority = 30;
+		t2.period_ms = 200;
+		t2.release_ms = 0;
+		t3._priority = 20;
+		t3.period_ms = 500;
+		t3.release_ms = 0;
+		t4._priority = 40;
+		t4.period_ms = 100;
+		t4.release_ms = 0;
+		comp_a.l1_priority = 31;
+		comp_a.l2_priority = 31;
+		comp_b.l1_priority = 41;
+		comp_b.l2_priority = 41;
+		comp_c.r_priority = 41;
+
+		//Set threadpool sizes
+		comp_a.l1_num_threads = forwarder_num_threads;
+		comp_a.l2_num_threads = forwarder_num_threads;
+		comp_b.l1_num_threads = forwarder_num_threads;
+		comp_b.l2_num_threads = forwarder_num_threads;
+		comp_c.r_num_threads = terminator_num_threads;
+
+		//Set priority protocols
+		comp_a.l1_priority_protocol = "fixed";
+		comp_a.l2_priority_protocol = "propagated";
+		comp_b.l1_priority_protocol = "propagated";
+		comp_b.l2_priority_protocol = "propagated";
+		comp_c.r_priority_protocol = "propagated";
+
+		//Set task IDs
+		t1.requestor = __COUNTER__;
+		t2.requestor = __COUNTER__;
+		t3.requestor = __COUNTER__;
+		t4.requestor = __COUNTER__;
+
+	}
+}

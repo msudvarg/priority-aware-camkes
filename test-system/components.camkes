@@ -1,0 +1,96 @@
+
+#include "../priority-aware-camkes/test-system/priority-protocols.camkes.h"
+
+/*
+	Root and System Dispatchers
+*/
+
+procedure SystemDispatch {
+    void dispatch(void);
+}
+
+component RootDispatcher {
+    control;
+
+    uses SystemDispatch sd0;
+    uses SystemDispatch sd1;
+    uses SystemDispatch sd2;
+    uses SystemDispatch sd3;
+    uses SystemDispatch sd4;
+	
+    uses Timer timeout;
+
+}
+
+component SystemDispatcher {
+    provides SystemDispatch sd;
+    emits TaskDispatch td1;
+    emits TaskDispatch td2;
+    emits TaskDispatch td3;
+    emits TaskDispatch td4;
+    consumes TaskDispatchComplete tdc1;
+    consumes TaskDispatchComplete tdc2;
+    consumes TaskDispatchComplete tdc3;
+    consumes TaskDispatchComplete tdc4;
+    dataport Buf miss_data;
+}
+
+/*
+	Task Dispatcher
+*/
+
+procedure Dispatch {
+    void dispatch(void);
+}
+
+component Dispatcher {
+	control;
+
+	consumes TaskDispatch td;
+    emits TaskDispatchComplete tdc;
+    uses Dispatch r;
+    attribute int task_id;
+    dataport Buf miss_data;
+    attribute int priority;
+    dispatcher_priority_attributes()
+}
+
+/*
+	Task
+*/
+
+procedure Request {
+    long request(in int priority, in int requestor);
+	void nest(in int priority, in int requestor);
+}
+
+component Task {
+	task_priority_attributes()
+
+    provides Dispatch rd;
+	uses Request r;
+}
+
+/*
+	Nested Service Components
+*/
+
+component L1 {
+	provides Request r;
+	interface_priority_attributes(r)
+	uses Request r1;
+	uses Request r2;
+}
+
+component L2 {
+	provides Request r1;
+	interface_priority_attributes(r1)
+	provides Request r2;
+	interface_priority_attributes(r2)
+	uses Request r;
+}
+
+component L3 {
+	provides Request r;
+	interface_priority_attributes(r)
+}
