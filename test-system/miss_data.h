@@ -1,7 +1,7 @@
 #ifndef _MISS_DATA_H_
 #define _MISS_DATA_H_
 
-#define NUM_TASKS 3
+#define NUM_TASKS 4
 
 struct Miss_Data {
     int misses;

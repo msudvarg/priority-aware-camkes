@@ -17,6 +17,7 @@ void sd_dispatch() {
     td1_emit();
     td2_emit();
     td3_emit();
+    td4_emit();
 
     set_priority(0);
 
@@ -24,6 +25,7 @@ void sd_dispatch() {
     tdc1_wait();
     tdc2_wait();
     tdc3_wait();
+    tdc4_wait();
 
     struct Miss_Data * md = (struct Miss_Data *)miss_data;
     for (int i = 0; i < NUM_TASKS; i++) {

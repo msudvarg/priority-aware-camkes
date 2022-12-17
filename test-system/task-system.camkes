@@ -12,11 +12,11 @@ import <global-connectors.camkes>; //Get connectors for TimeServer
 #include "../priority-aware-camkes/test-system/priority-protocols.camkes.h"
 import "../../../../priority-aware-camkes/priority-connectors.camkes";
 
-import "task_systems/pip_prop_prop_1_0.camkes";
-import "task_systems/pip_prop_prop_1_1.camkes";
-import "task_systems/pip_prop_prop_1_2.camkes";
-import "task_systems/pip_prop_prop_1_3.camkes";
-import "task_systems/pip_prop_prop_1_4.camkes";
+import "task_systems/pip_prop_prop_10_0.camkes";
+import "task_systems/pip_prop_prop_10_1.camkes";
+import "task_systems/pip_prop_prop_10_2.camkes";
+import "task_systems/pip_prop_prop_10_3.camkes";
+import "task_systems/pip_prop_prop_10_4.camkes";
 
 
 
@@ -32,11 +32,11 @@ assembly {
 
 		connection seL4TimeServer timeoutRoot( from rd.timeout, to timer.the_timer);
 
-		component pip_prop_prop_1_0 pip_prop_prop_1_0; connection seL4RPCCall rd0(from rd.sd0, to pip_prop_prop_1_0.sd); connection seL4TimeServer timeout0( from pip_prop_prop_1_0.d1, from pip_prop_prop_1_0.d2, from pip_prop_prop_1_0.d3, from pip_prop_prop_1_0.d4, to timer.the_timer);
-		component pip_prop_prop_1_1 pip_prop_prop_1_1; connection seL4RPCCall rd1(from rd.sd1, to pip_prop_prop_1_1.sd); connection seL4TimeServer timeout1( from pip_prop_prop_1_1.d1, from pip_prop_prop_1_1.d2, from pip_prop_prop_1_1.d3, from pip_prop_prop_1_1.d4, to timer.the_timer);
-		component pip_prop_prop_1_2 pip_prop_prop_1_2; connection seL4RPCCall rd2(from rd.sd2, to pip_prop_prop_1_2.sd); connection seL4TimeServer timeout2( from pip_prop_prop_1_2.d1, from pip_prop_prop_1_2.d2, from pip_prop_prop_1_2.d3, from pip_prop_prop_1_2.d4, to timer.the_timer);
-		component pip_prop_prop_1_3 pip_prop_prop_1_3; connection seL4RPCCall rd3(from rd.sd3, to pip_prop_prop_1_3.sd); connection seL4TimeServer timeout3( from pip_prop_prop_1_3.d1, from pip_prop_prop_1_3.d2, from pip_prop_prop_1_3.d3, from pip_prop_prop_1_3.d4, to timer.the_timer);
-		component pip_prop_prop_1_4 pip_prop_prop_1_4; connection seL4RPCCall rd4(from rd.sd4, to pip_prop_prop_1_4.sd); connection seL4TimeServer timeout4( from pip_prop_prop_1_4.d1, from pip_prop_prop_1_4.d2, from pip_prop_prop_1_4.d3, from pip_prop_prop_1_4.d4, to timer.the_timer);
+		component pip_prop_prop_10_0 pip_prop_prop_10_0; connection seL4RPCCall rd0(from rd.sd0, to pip_prop_prop_10_0.sd); connection seL4TimeServer timeout0( from pip_prop_prop_10_0.d1, from pip_prop_prop_10_0.d2, from pip_prop_prop_10_0.d3, from pip_prop_prop_10_0.d4, to timer.the_timer);
+		component pip_prop_prop_10_1 pip_prop_prop_10_1; connection seL4RPCCall rd1(from rd.sd1, to pip_prop_prop_10_1.sd); connection seL4TimeServer timeout1( from pip_prop_prop_10_1.d1, from pip_prop_prop_10_1.d2, from pip_prop_prop_10_1.d3, from pip_prop_prop_10_1.d4, to timer.the_timer);
+		component pip_prop_prop_10_2 pip_prop_prop_10_2; connection seL4RPCCall rd2(from rd.sd2, to pip_prop_prop_10_2.sd); connection seL4TimeServer timeout2( from pip_prop_prop_10_2.d1, from pip_prop_prop_10_2.d2, from pip_prop_prop_10_2.d3, from pip_prop_prop_10_2.d4, to timer.the_timer);
+		component pip_prop_prop_10_3 pip_prop_prop_10_3; connection seL4RPCCall rd3(from rd.sd3, to pip_prop_prop_10_3.sd); connection seL4TimeServer timeout3( from pip_prop_prop_10_3.d1, from pip_prop_prop_10_3.d2, from pip_prop_prop_10_3.d3, from pip_prop_prop_10_3.d4, to timer.the_timer);
+		component pip_prop_prop_10_4 pip_prop_prop_10_4; connection seL4RPCCall rd4(from rd.sd4, to pip_prop_prop_10_4.sd); connection seL4TimeServer timeout4( from pip_prop_prop_10_4.d1, from pip_prop_prop_10_4.d2, from pip_prop_prop_10_4.d3, from pip_prop_prop_10_4.d4, to timer.the_timer);
 	
 
 	}
