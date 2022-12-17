@@ -146,10 +146,10 @@ int main(int argc, char * argv[]) {
 	for (int i = 1; i <= 15; ++i) {
 		for (int j = 0; j < 10; ++j) {
 			std::string u = std::to_string(i) + "_" + std::to_string(j);
-			generate_camkes((float)i/100., generate_nested_pip_prop_pip, "pip_prop_pip_" + u, 2, 2, 3);
-			generate_camkes((float)i/100., generate_nested_pip_prop_prop, "pip_prop_prop_" + u, 2, 2, 3);
-			generate_camkes((float)i/100., generate_nested_ipcp_pip_prop, "ipcp_pip_prop_" + u, 1, 2, 1);
-			generate_camkes((float)i/100., generate_nested_ipcp_prop_pip, "ipcp_prop_pip_" + u, 1, 2, 2);
+			generate_camkes((float)i/100., generate_nested_pip_prop_pip, "pip_prop_pip_" + u, 3,3,3); //2,2,3
+			generate_camkes((float)i/100., generate_nested_pip_prop_prop, "pip_prop_prop_" + u, 3,3,3); //2,2,3
+			generate_camkes((float)i/100., generate_nested_ipcp_pip_prop, "ipcp_pip_prop_" + u, 1,3,3); //1,2,2
+			generate_camkes((float)i/100., generate_nested_ipcp_prop_pip, "ipcp_prop_pip_" + u, 1,3,3); //1,2,2
 		}
 	}
 

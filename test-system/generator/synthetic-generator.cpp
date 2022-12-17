@@ -59,7 +59,7 @@ std::vector<Task> try_generate(float u_total, std::vector<Task> tasks) {
         Task & task = tasks[i];
 
         //Get subtasks that need workloads assigned, and the total workload required
-        float C = task.C;
+        float C = task.C - task.overhead;
         std::set<std::string> subtasks;
         for (Subtask & subtask : task.subtasks) {
 
@@ -136,7 +136,7 @@ bool check_tasks(float u_total, std::vector<Task> & tasks) {
         for (const Subtask subtask : it->subtasks) {
             c += subtask.C;
         }
-        if (abs(c - it->C)/c > 0.000001) {
+        if (abs(c - it->C + it->overhead)/c > 0.000001) {
             std::cerr << "Subtask execution does not add to task execution" << std::endl;
             return false;
         }

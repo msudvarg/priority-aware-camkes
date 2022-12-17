@@ -30,6 +30,7 @@ struct Task {
 	float U = 0;
 	float T = 0;
 	float C = 0;
+	float overhead = 0;
 	float B = 0;
 	unsigned P = 0;
 	int index = 0;
